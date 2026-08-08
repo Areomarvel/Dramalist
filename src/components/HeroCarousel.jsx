@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { formatTitle } from '../utils/translateTitle';
+import { formatTitle, hasEnglishTitle } from '../utils/translateTitle';
 import { generatePoster } from '../utils/generatePoster';
 
 const IMAGE_BASE = 'https://image.tmdb.org/t/p/w1280';
@@ -8,9 +8,12 @@ const POSTER_BASE = 'https://image.tmdb.org/t/p/w500';
 
 const HeroCarousel = ({ recentItems = [], upcomingItems = [] }) => {
   const navigate = useNavigate();
+  const validRecent = recentItems.filter(hasEnglishTitle);
+  const validUpcoming = upcomingItems.filter(hasEnglishTitle);
+
   const allItems = [
-    ...recentItems.slice(0, 5).map(i => ({ ...i, _section: 'recent' })),
-    ...upcomingItems.slice(0, 5).map(i => ({ ...i, _section: 'upcoming' })),
+    ...validRecent.slice(0, 5).map(i => ({ ...i, _section: 'recent' })),
+    ...validUpcoming.slice(0, 5).map(i => ({ ...i, _section: 'upcoming' })),
   ];
 
   const [current, setCurrent] = useState(0);

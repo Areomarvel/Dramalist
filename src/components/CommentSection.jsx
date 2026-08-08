@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-const DEMO_COMMENTS = [
-  { id: 1, user: 'DramaFan2024', text: 'Absolutely loved this one! The acting was incredible.', date: '2024-07-15' },
-  { id: 2, user: 'KdramaLover', text: 'The chemistry between the leads was off the charts! Highly recommend.', date: '2024-07-18' },
-  { id: 3, user: 'AsianMediaJunkie', text: 'Great storyline, kept me on the edge of my seat all night!', date: '2024-07-22' },
-];
-
 const CommentSection = ({ targetId, type = 'drama' }) => {
   const storageKey = `comments_${type}_${targetId}`;
 
@@ -19,10 +13,7 @@ const CommentSection = ({ targetId, type = 'drama' }) => {
     if (saved) {
       setComments(JSON.parse(saved));
     } else {
-      // Seed with demo comments if none saved
-      const seeded = DEMO_COMMENTS.map(c => ({ ...c, id: c.id + targetId }));
-      setComments(seeded);
-      localStorage.setItem(storageKey, JSON.stringify(seeded));
+      setComments([]);
     }
   }, [storageKey]);
 

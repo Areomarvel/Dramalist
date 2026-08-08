@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import CommentSection from '../components/CommentSection';
 import ReactionBox from '../components/ReactionBox';
 import { generatePoster } from '../utils/generatePoster';
-import { formatTitle } from '../utils/translateTitle';
+import { formatTitle, hasEnglishTitle } from '../utils/translateTitle';
 
 const API_KEY = "37f536bf16346bfc6cfcefca8f004b89";
 const BASE_URL = "https://api.themoviedb.org/3";
@@ -48,14 +48,22 @@ const PersonDetail = () => {
     ? `https://instagram.com/${person.external_ids.instagram_id}`
     : null;
 
-  // Sort ALL credits by popularity
+  // Helper to extract timestamp for chronological sorting (newest to oldest)
+  const getReleaseTime = (item) => {
+    const dateStr = item.first_air_date || item.release_date;
+    return dateStr ? new Date(dateStr).getTime() : 0;
+  };
+
+  // Filter out untranslatable non-English titles & sort ALL credits from most recent to oldest
   const allCredits = person.combined_credits?.cast || [];
   const tvCredits = allCredits
     .filter(c => c.media_type === 'tv')
-    .sort((a, b) => b.popularity - a.popularity);
+    .filter(hasEnglishTitle)
+    .sort((a, b) => getReleaseTime(b) - getReleaseTime(a));
   const movieCredits = allCredits
     .filter(c => c.media_type === 'movie')
-    .sort((a, b) => b.popularity - a.popularity);
+    .filter(hasEnglishTitle)
+    .sort((a, b) => getReleaseTime(b) - getReleaseTime(a));
 
   const INITIAL_SHOW = 12;
   const displayedTV = showAllTV ? tvCredits : tvCredits.slice(0, INITIAL_SHOW);

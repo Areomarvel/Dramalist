@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import DramaCard from '../components/DramaCard';
+import { hasEnglishTitle } from '../utils/translateTitle';
 
 const API_KEY = "37f536bf16346bfc6cfcefca8f004b89";
 const BASE_URL = "https://api.themoviedb.org/3";
@@ -44,7 +45,8 @@ const Upcoming = () => {
       const res = await fetch(`${BASE_URL}/discover/tv?api_key=${API_KEY}&${getQueryParams(cat)}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.status_message || "Failed to fetch upcoming content");
-      setDramas(data.results || []);
+      const valid = (data.results || []).filter(hasEnglishTitle);
+      setDramas(valid);
     } catch (err) {
       setError(err.message);
     } finally {

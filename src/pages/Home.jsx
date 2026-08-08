@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import DramaCard from '../components/DramaCard';
 import HeroCarousel from '../components/HeroCarousel';
 import PopularCarousel from '../components/PopularCarousel';
+import { hasEnglishTitle } from '../utils/translateTitle';
 import '../App.css';
 
 const API_KEY = '37f536bf16346bfc6cfcefca8f004b89';
@@ -58,16 +59,33 @@ function Home() {
   const loadCarouselData = async (cat) => {
     const base = getQueryParams(cat);
     try {
-      const [recentRes, upcomingRes] = await Promise.all([
+      const [recentRes1, recentRes2, upcomingRes1, upcomingRes2] = await Promise.all([
         fetch(`${BASE_URL}/discover/tv?api_key=${API_KEY}&${base}&sort_by=first_air_date.desc&first_air_date.lte=${today}&page=1`),
+        fetch(`${BASE_URL}/discover/tv?api_key=${API_KEY}&${base}&sort_by=first_air_date.desc&first_air_date.lte=${today}&page=2`),
         fetch(`${BASE_URL}/discover/tv?api_key=${API_KEY}&${base}&sort_by=first_air_date.asc&first_air_date.gte=${today}&page=1`),
+        fetch(`${BASE_URL}/discover/tv?api_key=${API_KEY}&${base}&sort_by=first_air_date.asc&first_air_date.gte=${today}&page=2`),
       ]);
-      const [recentData, upcomingData] = await Promise.all([recentRes.json(), upcomingRes.json()]);
+      const [recentData1, recentData2, upcomingData1, upcomingData2] = await Promise.all([
+        recentRes1.json(), recentRes2.json(), upcomingRes1.json(), upcomingRes2.json()
+      ]);
+
+      const allRecent = [...(recentData1.results || []), ...(recentData2.results || [])];
+      const allUpcoming = [...(upcomingData1.results || []), ...(upcomingData2.results || [])];
+
+      // Filter out dramas with untranslatable non-English titles & sort by popularity (actor/show popularity)
+      const validRecent = allRecent
+        .filter(hasEnglishTitle)
+        .sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+
+      const validUpcoming = allUpcoming
+        .filter(hasEnglishTitle)
+        .sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+
       setCarouselData(prev => ({
         ...prev,
         [cat]: {
-          recent: (recentData.results || []).slice(0, 5),
-          upcoming: (upcomingData.results || []).slice(0, 5),
+          recent: validRecent.slice(0, 5),
+          upcoming: validUpcoming.slice(0, 5),
         }
       }));
     } catch (err) {
@@ -80,9 +98,10 @@ function Home() {
     try {
       const res = await fetch(`${BASE_URL}/discover/tv?api_key=${API_KEY}&${base}&sort_by=popularity.desc&page=1`);
       const data = await res.json();
+      const validPopular = (data.results || []).filter(hasEnglishTitle);
       setPopularData(prev => ({
         ...prev,
-        [cat]: (data.results || []).slice(0, 20),
+        [cat]: validPopular.slice(0, 20),
       }));
     } catch (err) {
       console.error('Popular fetch error:', err);
@@ -99,7 +118,8 @@ function Home() {
       if (!response.ok || !data.results) {
         throw new Error(data.status_message || 'Unable to load content');
       }
-      setDramas(data.results || []);
+      const validDramas = (data.results || []).filter(hasEnglishTitle);
+      setDramas(validDramas);
     } catch (fetchError) {
       console.error('Fetch Error:', fetchError);
       setError('Unable to load content. Please check your connection.');

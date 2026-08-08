@@ -47,6 +47,8 @@ const DramaCard = ({ drama = {} }) => {
     drama.original_name || drama.original_title
   );
 
+  if (!title) return null;
+
   return (
     <div className="drama-card" onClick={() => navigate(`/drama/${drama.id}`)}>
       <div className="poster-wrapper">

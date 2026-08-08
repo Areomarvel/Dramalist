@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import DramaCard from '../components/DramaCard';
-import { formatTitle } from '../utils/translateTitle';
+import { formatTitle, hasEnglishTitle } from '../utils/translateTitle';
 
 const API_KEY = "37f536bf16346bfc6cfcefca8f004b89";
 const BASE_URL = "https://api.themoviedb.org/3";
@@ -25,7 +25,7 @@ const SearchResults = () => {
         const res = await fetch(`${BASE_URL}/search/multi?api_key=${API_KEY}&query=${encodeURIComponent(query)}`);
         const data = await res.json();
         if (data.results) {
-          const dramas = data.results.filter(item => item.media_type === 'tv' || item.media_type === 'movie');
+          const dramas = data.results.filter(item => (item.media_type === 'tv' || item.media_type === 'movie') && hasEnglishTitle(item));
           const people = data.results.filter(item => item.media_type === 'person');
           setResults({ dramas, people });
         }

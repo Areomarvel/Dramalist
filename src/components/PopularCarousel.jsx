@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { formatTitle } from '../utils/translateTitle';
+import { formatTitle, hasEnglishTitle } from '../utils/translateTitle';
 import { generatePoster } from '../utils/generatePoster';
 
 const POSTER_BASE = 'https://image.tmdb.org/t/p/w342';
@@ -13,9 +13,11 @@ const PopularCarousel = ({ items = [], label = 'Most Popular' }) => {
   const posRef = useRef(0);
   const pausedRef = useRef(false);
 
+  const validItems = items.filter(hasEnglishTitle);
+
   // Generate fallback posters
   useEffect(() => {
-    items.forEach(item => {
+    validItems.forEach(item => {
       if (!item.poster_path) {
         const title = item.name || item.title || '';
         if (title && !generatedPosters[item.id]) {
@@ -24,12 +26,12 @@ const PopularCarousel = ({ items = [], label = 'Most Popular' }) => {
         }
       }
     });
-  }, [items.length]);
+  }, [validItems.length]);
 
   // Continuous scroll animation
   useEffect(() => {
     const track = trackRef.current;
-    if (!track || items.length === 0) return;
+    if (!track || validItems.length === 0) return;
 
     const speed = 0.6; // px per frame
 
@@ -47,12 +49,12 @@ const PopularCarousel = ({ items = [], label = 'Most Popular' }) => {
 
     animRef.current = requestAnimationFrame(animate);
     return () => cancelAnimationFrame(animRef.current);
-  }, [items.length]);
+  }, [validItems.length]);
 
-  if (!items.length) return null;
+  if (!validItems.length) return null;
 
   // Duplicate items for seamless loop
-  const displayItems = [...items, ...items];
+  const displayItems = [...validItems, ...validItems];
 
   return (
     <div className="popular-carousel-wrapper">
