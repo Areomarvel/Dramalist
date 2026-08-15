@@ -49,8 +49,13 @@ const DramaCard = ({ drama = {} }) => {
 
   if (!title) return null;
 
+  const isMovie = drama.media_type === 'movie' || (!drama.first_air_date && drama.release_date);
+
   return (
-    <div className="drama-card" onClick={() => navigate(`/drama/${drama.id}`)}>
+    <div
+      className="drama-card"
+      onClick={() => navigate(isMovie ? `/movie/${drama.id}` : `/drama/${drama.id}`)}
+    >
       <div className="poster-wrapper">
         {posterPath ? (
           <img

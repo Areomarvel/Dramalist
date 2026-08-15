@@ -2,12 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import CommentSection from '../components/CommentSection';
 import ReactionBox from '../components/ReactionBox';
+import ShareButton from '../components/ShareButton';
+import Breadcrumbs from '../components/Breadcrumbs';
 import { generatePoster } from '../utils/generatePoster';
 import { formatTitle, hasEnglishTitle } from '../utils/translateTitle';
 
-const API_KEY = "37f536bf16346bfc6cfcefca8f004b89";
-const BASE_URL = "https://api.themoviedb.org/3";
-const IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w500";
+const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
+const BASE_URL = 'https://api.themoviedb.org/3';
+const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 
 const PersonDetail = () => {
   const { id } = useParams();
@@ -24,7 +26,7 @@ const PersonDetail = () => {
       try {
         const res = await fetch(`${BASE_URL}/person/${id}?api_key=${API_KEY}&append_to_response=combined_credits,external_ids`);
         const data = await res.json();
-        if (!res.ok) throw new Error(data.status_message || "Failed to fetch person details");
+        if (!res.ok) throw new Error(data.status_message || 'Failed to fetch person details');
         setPerson(data);
       } catch (err) {
         setError(err.message);
@@ -48,13 +50,11 @@ const PersonDetail = () => {
     ? `https://instagram.com/${person.external_ids.instagram_id}`
     : null;
 
-  // Helper to extract timestamp for chronological sorting (newest to oldest)
   const getReleaseTime = (item) => {
     const dateStr = item.first_air_date || item.release_date;
     return dateStr ? new Date(dateStr).getTime() : 0;
   };
 
-  // Filter out untranslatable non-English titles & sort ALL credits from most recent to oldest
   const allCredits = person.combined_credits?.cast || [];
   const tvCredits = allCredits
     .filter(c => c.media_type === 'tv')
@@ -81,6 +81,7 @@ const PersonDetail = () => {
 
   return (
     <div className="app-container detail-page">
+      <Breadcrumbs items={[{ label: 'Actors & Cast', to: '/' }, { label: person.name }]} />
       <button className="back-btn" onClick={() => navigate(-1)}>← Back</button>
 
       <div className="detail-header">
@@ -93,7 +94,12 @@ const PersonDetail = () => {
         )}
 
         <div className="detail-info">
-          <h1 className="detail-title">{person.name}</h1>
+          <div className="detail-title-row">
+            <h1 className="detail-title">{person.name}</h1>
+            <div className="detail-title-actions">
+              <ShareButton title={person.name} text={`Check out ${person.name} on AsianDramaWiki!`} />
+            </div>
+          </div>
 
           <div className="person-stats-row">
             {person.known_for_department && (
@@ -168,7 +174,9 @@ const PersonDetail = () => {
               <div
                 key={credit.credit_id || credit.id}
                 className="filmography-card"
-                onClick={() => navigate(credit.media_type === 'tv' ? `/drama/${credit.id}` : '#')}
+                onClick={() => navigate(
+                  credit.media_type === 'tv' ? `/drama/${credit.id}` : `/movie/${credit.id}`
+                )}
               >
                 <div className="filmography-poster">
                   <img src={posterUrl} alt={title} loading="lazy" />

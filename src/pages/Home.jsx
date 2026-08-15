@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import DramaCard from '../components/DramaCard';
 import HeroCarousel from '../components/HeroCarousel';
 import PopularCarousel from '../components/PopularCarousel';
-import { hasEnglishTitle } from '../utils/translateTitle';
+import AdvancedFilterModal from '../components/AdvancedFilterModal';
+import SurpriseMeModal from '../components/SurpriseMeModal';
+import { hasEnglishTitle, formatTitle } from '../utils/translateTitle';
+import { generatePoster } from '../utils/generatePoster';
 import '../App.css';
 
-const API_KEY = '37f536bf16346bfc6cfcefca8f004b89';
+const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const BASE_URL = 'https://api.themoviedb.org/3';
+const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 
 const CATEGORIES = [
   { key: 'KR', label: '🇰🇷 K-Dramas', countryParam: 'with_origin_country=KR' },
@@ -32,28 +37,33 @@ function getQueryParams(cat) {
 }
 
 function Home() {
+  const navigate = useNavigate();
   const [dramas, setDramas] = useState([]);
   const [category, setCategory] = useState('KR');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
 
-  // Carousel state per category
   const [carouselData, setCarouselData] = useState({});
   const [popularData, setPopularData] = useState({});
+  const [airingNow, setAiringNow] = useState([]);
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+  const [isSurpriseOpen, setIsSurpriseOpen] = useState(false);
+  const [appliedFilters, setAppliedFilters] = useState({});
 
-  // Load main grid
+  // Reset page when category changes
   useEffect(() => {
-    loadDramasByCategory(category);
+    setPage(1);
+    setHasMore(true);
+    loadDramasByCategory(category, 1, true);
   }, [category]);
 
-  // Load carousel data when category changes
   useEffect(() => {
-    if (!carouselData[category]) {
-      loadCarouselData(category);
-    }
-    if (!popularData[category]) {
-      loadPopularData(category);
-    }
+    if (!carouselData[category]) loadCarouselData(category);
+    if (!popularData[category]) loadPopularData(category);
+    loadAiringNow(category);
   }, [category]);
 
   const loadCarouselData = async (cat) => {
@@ -72,21 +82,12 @@ function Home() {
       const allRecent = [...(recentData1.results || []), ...(recentData2.results || [])];
       const allUpcoming = [...(upcomingData1.results || []), ...(upcomingData2.results || [])];
 
-      // Filter out dramas with untranslatable non-English titles & sort by popularity (actor/show popularity)
-      const validRecent = allRecent
-        .filter(hasEnglishTitle)
-        .sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
-
-      const validUpcoming = allUpcoming
-        .filter(hasEnglishTitle)
-        .sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+      const validRecent = allRecent.filter(hasEnglishTitle).sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
+      const validUpcoming = allUpcoming.filter(hasEnglishTitle).sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
 
       setCarouselData(prev => ({
         ...prev,
-        [cat]: {
-          recent: validRecent.slice(0, 5),
-          upcoming: validUpcoming.slice(0, 5),
-        }
+        [cat]: { recent: validRecent.slice(0, 5), upcoming: validUpcoming.slice(0, 5) }
       }));
     } catch (err) {
       console.error('Carousel fetch error:', err);
@@ -99,33 +100,53 @@ function Home() {
       const res = await fetch(`${BASE_URL}/discover/tv?api_key=${API_KEY}&${base}&sort_by=popularity.desc&page=1`);
       const data = await res.json();
       const validPopular = (data.results || []).filter(hasEnglishTitle);
-      setPopularData(prev => ({
-        ...prev,
-        [cat]: validPopular.slice(0, 20),
-      }));
+      setPopularData(prev => ({ ...prev, [cat]: validPopular.slice(0, 20) }));
     } catch (err) {
       console.error('Popular fetch error:', err);
     }
   };
 
-  const loadDramasByCategory = async (cat) => {
-    setLoading(true);
+  const loadAiringNow = async (cat) => {
+    const base = getQueryParams(cat);
+    try {
+      const res = await fetch(`${BASE_URL}/discover/tv?api_key=${API_KEY}&${base}&sort_by=popularity.desc&with_status=0&air_date.gte=${today}&first_air_date.lte=${today}`);
+      const data = await res.json();
+      const valid = (data.results || []).filter(hasEnglishTitle).slice(0, 12);
+      setAiringNow(valid);
+    } catch (err) {
+      console.error('Airing now fetch error:', err);
+    }
+  };
+
+  const loadDramasByCategory = async (cat, pageNum = 1, reset = false) => {
+    if (pageNum === 1) setLoading(true);
+    else setLoadingMore(true);
     setError('');
     const base = getQueryParams(cat);
     try {
-      const response = await fetch(`${BASE_URL}/discover/tv?api_key=${API_KEY}&${base}&sort_by=first_air_date.desc&first_air_date.lte=${today}`);
+      const response = await fetch(`${BASE_URL}/discover/tv?api_key=${API_KEY}&${base}&sort_by=first_air_date.desc&first_air_date.lte=${today}&page=${pageNum}`);
       const data = await response.json();
-      if (!response.ok || !data.results) {
-        throw new Error(data.status_message || 'Unable to load content');
-      }
+      if (!response.ok || !data.results) throw new Error(data.status_message || 'Unable to load content');
       const validDramas = (data.results || []).filter(hasEnglishTitle);
-      setDramas(validDramas);
+      if (reset || pageNum === 1) {
+        setDramas(validDramas);
+      } else {
+        setDramas(prev => [...prev, ...validDramas]);
+      }
+      setHasMore(pageNum < (data.total_pages || 1));
     } catch (fetchError) {
       console.error('Fetch Error:', fetchError);
       setError('Unable to load content. Please check your connection.');
-      setDramas([]);
+      if (reset) setDramas([]);
     }
     setLoading(false);
+    setLoadingMore(false);
+  };
+
+  const handleLoadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    loadDramasByCategory(category, nextPage, false);
   };
 
   const currentCategory = CATEGORIES.find(c => c.key === category);
@@ -137,17 +158,49 @@ function Home() {
 
       {/* Category Filter Tabs */}
       <div className="filter-container">
-        {CATEGORIES.map(cat => (
+        <div className="filter-categories-left">
+          {CATEGORIES.map(cat => (
+            <button
+              key={cat.key}
+              className={`filter-btn ${category === cat.key ? 'active' : ''}`}
+              onClick={() => setCategory(cat.key)}
+              id={`filter-${cat.key.toLowerCase()}`}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="filter-actions-right">
           <button
-            key={cat.key}
-            className={`filter-btn ${category === cat.key ? 'active' : ''}`}
-            onClick={() => setCategory(cat.key)}
-            id={`filter-${cat.key.toLowerCase()}`}
+            type="button"
+            className="filter-btn surprise-me-btn"
+            onClick={() => setIsSurpriseOpen(true)}
           >
-            {cat.label}
+            🎲 Surprise Me
           </button>
-        ))}
+          <button
+            type="button"
+            className="filter-btn advanced-filter-btn"
+            onClick={() => setIsFilterModalOpen(true)}
+          >
+            🎛️ Filters
+          </button>
+        </div>
       </div>
+
+      <AdvancedFilterModal
+        isOpen={isFilterModalOpen}
+        onClose={() => setIsFilterModalOpen(false)}
+        currentFilters={appliedFilters}
+        onApplyFilters={(f) => setAppliedFilters(f)}
+      />
+
+      <SurpriseMeModal
+        isOpen={isSurpriseOpen}
+        onClose={() => setIsSurpriseOpen(false)}
+        dramas={dramas}
+      />
 
       {/* Hero Carousel: Recent + Upcoming */}
       {(carouselInfo.recent.length > 0 || carouselInfo.upcoming.length > 0) && (
@@ -163,6 +216,44 @@ function Home() {
           items={popularList}
           label={`Most Popular ${currentCategory?.label || ''}`}
         />
+      )}
+
+      {/* Now Airing Section */}
+      {airingNow.length > 0 && (
+        <div className="now-airing-section">
+          <div className="section-header" style={{ marginBottom: '16px' }}>
+            <h2 className="section-title">
+              📡 Now Airing — {currentCategory?.label}
+            </h2>
+            <span className="now-airing-status-tag">Airing This Week</span>
+          </div>
+          <div className="now-airing-scroll">
+            {airingNow.map(item => {
+              const formattedTitle = formatTitle(item.name, item.original_name);
+              const poster = item.poster_path
+                ? `${IMAGE_BASE_URL}${item.poster_path}`
+                : generatePoster(item.name || item.original_name || 'Drama');
+              return (
+                <div
+                  key={item.id}
+                  className="now-airing-card"
+                  onClick={() => navigate(`/drama/${item.id}`)}
+                >
+                  <div className="now-airing-poster">
+                    <img src={poster} alt={formattedTitle} loading="lazy" />
+                    {item.vote_average > 0 && (
+                      <span className="rating-badge">★ {item.vote_average?.toFixed(1)}</span>
+                    )}
+                  </div>
+                  <div className="now-airing-info">
+                    <p className="now-airing-title" title={formattedTitle}>{formattedTitle}</p>
+                    <span className="now-airing-subtext">On Air</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       )}
 
       {/* Section Title */}
@@ -185,13 +276,29 @@ function Home() {
           ))}
         </div>
       ) : (
-        <div className="drama-grid">
-          {dramas.length > 0 ? (
-            dramas.map((drama) => <DramaCard key={drama.id} drama={drama} />)
-          ) : (
-            <p className="no-content-msg">No dramas found. Try a different category.</p>
+        <>
+          <div className="drama-grid">
+            {dramas.length > 0 ? (
+              dramas.map((drama) => <DramaCard key={drama.id} drama={drama} />)
+            ) : (
+              <p className="no-content-msg">No dramas found. Try a different category.</p>
+            )}
+          </div>
+
+          {/* Load More */}
+          {hasMore && dramas.length > 0 && (
+            <div className="load-more-container">
+              <button
+                className="load-more-btn"
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                id="load-more-dramas"
+              >
+                {loadingMore ? 'Loading…' : 'Load More'}
+              </button>
+            </div>
           )}
-        </div>
+        </>
       )}
     </div>
   );

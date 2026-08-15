@@ -1436,6 +1436,21 @@ button { font-family: inherit; cursor: pointer; }
 .comment-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
 .comment-username { font-size: 0.9rem; font-weight: 700; color: var(--text); }
 .comment-date { font-size: 0.78rem; color: var(--text-dim); }
+.comment-delete-btn {
+  margin-left: auto;
+  background: transparent;
+  border: none;
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+.comment-card:hover .comment-delete-btn { opacity: 1; }
+.comment-delete-btn:hover { color: #f85149; background: rgba(248,81,73,0.1); }
 .comment-text { margin: 0; line-height: 1.55; color: var(--text); font-size: 0.92rem; }
 
 /* ----------------------------------------------------------------
@@ -1811,4 +1826,1421 @@ button { font-family: inherit; cursor: pointer; }
 
   /* Search */
   .navbar-search-bar { padding: 8px 12px; }
+}
+
+/* ----------------------------------------------------------------
+   25. Watchlist Page
+   ---------------------------------------------------------------- */
+.watchlist-header { margin-bottom: 32px; }
+.watchlist-title { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 800; color: var(--text); margin-bottom: 6px; }
+.watchlist-subtitle { color: var(--text-muted); font-size: 1rem; }
+.watchlist-empty { text-align: center; padding: 80px 20px; }
+.watchlist-empty-icon { font-size: 4rem; margin-bottom: 16px; }
+.watchlist-empty h3 { font-size: 1.3rem; font-weight: 700; color: var(--text); margin-bottom: 10px; }
+.watchlist-empty p { color: var(--text-muted); margin-bottom: 24px; font-size: 0.95rem; }
+.watchlist-browse-btn { background: var(--accent); color: #fff; border: none; padding: 12px 28px; border-radius: 999px; font-weight: 700; transition: opacity 0.2s ease, transform 0.2s ease; }
+.watchlist-browse-btn:hover { opacity: 0.85; transform: translateY(-2px); }
+.watchlist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
+.watchlist-card { cursor: pointer; border-radius: 12px; overflow: hidden; background: var(--card-bg); border: 1px solid var(--border); transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease; }
+.watchlist-card:hover { transform: translateY(-6px); box-shadow: 0 8px 24px rgba(0,0,0,0.5); border-color: var(--accent); }
+.watchlist-poster { position: relative; width: 100%; height: 260px; overflow: hidden; }
+.watchlist-poster img { width: 100%; height: 100%; object-fit: cover; object-position: top; transition: transform 0.4s ease; }
+.watchlist-card:hover .watchlist-poster img { transform: scale(1.04); }
+.watchlist-poster-placeholder { width: 100%; height: 100%; background: linear-gradient(135deg, var(--bg-alt), var(--card-bg)); display: flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 800; color: var(--text-muted); }
+.media-type-badge { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px); padding: 3px 8px; border-radius: 6px; font-size: 0.85rem; }
+.watchlist-remove-overlay { position: absolute; top: 10px; right: 10px; opacity: 0; transition: opacity 0.2s ease; }
+.watchlist-card:hover .watchlist-remove-overlay { opacity: 1; }
+.watchlist-info { padding: 12px 14px; }
+.watchlist-item-title { font-size: 0.88rem; font-weight: 700; color: var(--text); margin-bottom: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.watchlist-item-year { font-size: 0.78rem; color: var(--text-muted); margin: 0; }
+
+/* ----------------------------------------------------------------
+   26. WatchlistButton
+   ---------------------------------------------------------------- */
+.watchlist-btn { background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.2); color: #fff; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; transition: background 0.2s ease, transform 0.2s ease; cursor: pointer; }
+.watchlist-btn:hover { background: var(--accent); transform: scale(1.1); }
+.watchlist-btn.saved { background: var(--accent); border-color: var(--accent); }
+.watchlist-btn.large { width: 44px; height: 44px; font-size: 1.2rem; border-radius: 8px; background: var(--card-bg); border: 1px solid var(--border); color: var(--text); }
+.watchlist-btn.large:hover, .watchlist-btn.large.saved { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* ----------------------------------------------------------------
+   27. ShareButton
+   ---------------------------------------------------------------- */
+.share-btn { display: inline-flex; align-items: center; gap: 6px; background: var(--card-bg); border: 1px solid var(--border); color: var(--text-muted); padding: 8px 16px; border-radius: 8px; font-size: 0.88rem; font-weight: 600; transition: all 0.2s ease; }
+.share-btn:hover { background: var(--accent); border-color: var(--accent); color: #fff; }
+.share-copied { color: #3fb950; font-size: 0.82rem; font-weight: 600; }
+
+/* ----------------------------------------------------------------
+   28. BackToTop
+   ---------------------------------------------------------------- */
+.back-to-top { position: fixed; bottom: 28px; right: 24px; z-index: 400; width: 44px; height: 44px; border-radius: 50%; background: var(--accent); color: #fff; border: none; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; box-shadow: 0 8px 24px rgba(0,0,0,0.5); cursor: pointer; opacity: 0; transform: translateY(16px); pointer-events: none; transition: opacity 0.3s, transform 0.3s; }
+.back-to-top.visible { opacity: 1; transform: translateY(0); pointer-events: all; }
+.back-to-top:hover { transform: translateY(-3px); }
+
+/* ----------------------------------------------------------------
+   29. Not Found Page (404)
+   ---------------------------------------------------------------- */
+.not-found-page { min-height: calc(100vh - var(--navbar-h)); display: flex; align-items: center; justify-content: center; padding: 40px 20px; }
+.not-found-content { text-align: center; max-width: 480px; }
+.not-found-emoji { font-size: 5rem; margin-bottom: 16px; display: block; }
+.not-found-title { font-size: clamp(5rem, 15vw, 9rem); font-weight: 900; color: var(--accent); line-height: 1; margin-bottom: 8px; letter-spacing: -0.04em; }
+.not-found-subtitle { font-size: 1.6rem; font-weight: 700; color: var(--text); margin-bottom: 14px; }
+.not-found-desc { color: var(--text-muted); line-height: 1.65; margin-bottom: 32px; font-size: 0.97rem; }
+.not-found-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.nf-btn { padding: 12px 28px; border-radius: 999px; font-weight: 700; font-size: 0.95rem; transition: all 0.2s ease; border: 2px solid transparent; }
+.nf-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.nf-btn.primary:hover { opacity: 0.85; transform: translateY(-2px); }
+.nf-btn.secondary { background: transparent; border-color: var(--border); color: var(--text-muted); }
+.nf-btn.secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ----------------------------------------------------------------
+   30. Additional Mobile Fixes
+   ---------------------------------------------------------------- */
+@media (max-width: 600px) {
+  .watchlist-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+  .watchlist-poster { height: 200px; }
+  .not-found-title { font-size: 6rem; }
+  .not-found-subtitle { font-size: 1.3rem; }
+  .back-to-top { bottom: 16px; right: 14px; }
+  .forum-comment-input { max-width: 100%; }
+}
+
+/* ----------------------------------------------------------------
+   31. Progress Tracker Component
+   ---------------------------------------------------------------- */
+.progress-tracker-container {
+  position: relative;
+  margin: 18px 0;
+}
+.progress-status-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.progress-main-btn {
+  background: var(--card-bg);
+  border: 2px solid var(--border);
+  color: var(--text);
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+.progress-main-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.progress-main-btn.active {
+  background: var(--accent-glow);
+}
+.progress-ep-counter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+.ep-step-btn {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+.ep-step-btn:hover:not(:disabled) {
+  background: var(--accent);
+  color: #fff;
+}
+.ep-step-btn:disabled { opacity: 0.4; cursor: default; }
+.ep-counter-text { font-size: 0.88rem; color: var(--text); }
+
+.progress-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 200;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: 16px;
+  margin-top: 8px;
+  width: 280px;
+  animation: slideDown 0.2s ease;
+}
+.dropdown-title { font-size: 0.82rem; font-weight: 700; color: var(--text-muted); margin-bottom: 10px; text-transform: uppercase; }
+.dropdown-options { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.dropdown-opt-btn {
+  text-align: left;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 9px 14px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.15s ease;
+}
+.dropdown-opt-btn:hover { background: var(--accent-glow); color: var(--accent); border-color: var(--accent); }
+.dropdown-opt-btn.selected { background: var(--accent); color: #fff; border-color: var(--accent); }
+.dropdown-remove-btn {
+  width: 100%;
+  background: transparent;
+  border: 1px dashed var(--accent2);
+  color: var(--accent2);
+  padding: 8px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  font-size: 0.82rem;
+}
+
+/* ----------------------------------------------------------------
+   32. Streaming Links Badges
+   ---------------------------------------------------------------- */
+.streaming-links-container {
+  margin: 36px 0;
+  background: var(--card-bg);
+  padding: 24px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+.streaming-title { font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 16px; }
+.streaming-badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+}
+.streaming-badge-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+.streaming-badge-card:hover {
+  border-color: var(--provider-color, var(--accent));
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  transform: translateY(-2px);
+}
+.provider-icon { font-size: 1.2rem; }
+.provider-arrow { margin-left: auto; font-size: 0.8rem; opacity: 0.6; }
+
+/* ----------------------------------------------------------------
+   33. Episode Guide & Spoiler Protection
+   ---------------------------------------------------------------- */
+.episode-guide-container {
+  margin: 36px 0;
+  background: var(--card-bg);
+  padding: 24px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+.episode-guide-heading { font-size: 1.2rem; font-weight: 700; color: var(--text); margin-bottom: 16px; }
+.episode-tabs-scroll {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-bottom: 12px;
+  margin-bottom: 20px;
+  max-height: 180px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+}
+.episode-tabs-scroll::-webkit-scrollbar { width: 4px; }
+.episode-tabs-scroll::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 999px; }
+.ep-tab-btn {
+  flex: 0 0 auto;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-alt);
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.82rem;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.ep-tab-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ep-tab-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+@media (max-width: 600px) {
+  .episode-tabs-scroll {
+    max-height: 140px;
+    gap: 6px;
+  }
+  .ep-tab-btn {
+    padding: 5px 11px;
+    font-size: 0.78rem;
+  }
+}
+
+.active-ep-card {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  padding: 20px;
+  border-radius: var(--radius-sm);
+}
+.active-ep-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+.active-ep-header h4 { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+.ep-badge { background: var(--accent-glow); color: var(--accent); padding: 4px 12px; border-radius: 999px; font-weight: 700; font-size: 0.8rem; }
+.active-ep-overview { color: var(--text-muted); line-height: 1.6; margin-bottom: 18px; font-size: 0.95rem; }
+
+.spoiler-box {
+  background: var(--card-bg);
+  border: 1px dashed var(--accent2);
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
+}
+.spoiler-header { display: flex; justify-content: space-between; align-items: center; font-size: 0.88rem; font-weight: 700; color: var(--accent2); margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
+.spoiler-toggle-btn { background: var(--accent2); color: #fff; border: none; padding: 5px 14px; border-radius: 999px; font-weight: 700; font-size: 0.78rem; }
+.spoiler-content.blurred { filter: blur(6px); user-select: none; pointer-events: none; opacity: 0.4; }
+.spoiler-content.revealed { filter: none; opacity: 1; transition: filter 0.3s ease; }
+.spoiler-content p { font-size: 0.9rem; color: var(--text); line-height: 1.55; }
+
+/* ----------------------------------------------------------------
+   34. Detailed Review Section
+   ---------------------------------------------------------------- */
+.review-section-container {
+  margin: 36px 0;
+  background: var(--card-bg);
+  padding: 24px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+.review-section-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+.review-section-header h3 { font-size: 1.2rem; font-weight: 700; color: var(--text); }
+.review-subtitle { font-size: 0.9rem; color: var(--text-muted); }
+.write-review-btn { background: var(--accent); color: #fff; border: none; padding: 9px 20px; border-radius: 999px; font-weight: 700; font-size: 0.9rem; }
+
+.review-form-card {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  padding: 20px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.review-form-card h4 { color: var(--text); font-size: 1.05rem; }
+.review-input {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.92rem;
+}
+.review-textarea { resize: vertical; min-height: 100px; }
+.sliders-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.slider-item label { display: block; font-size: 0.85rem; color: var(--text); margin-bottom: 4px; }
+.slider-item input[type="range"] { width: 100%; accent-color: var(--accent); }
+.overall-score-preview { font-size: 1rem; color: var(--star-fill); background: var(--card-bg); padding: 8px 14px; border-radius: var(--radius-sm); width: fit-content; }
+.submit-review-btn { background: var(--accent); color: #fff; border: none; padding: 11px; border-radius: var(--radius-sm); font-weight: 700; font-size: 0.95rem; }
+
+.reviews-feed { display: flex; flex-direction: column; gap: 16px; }
+.no-reviews { color: var(--text-muted); font-size: 0.9rem; }
+.review-card { background: var(--bg-alt); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 18px; }
+.review-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.review-author-info { display: flex; align-items: center; gap: 10px; }
+.review-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+.review-author-name { display: block; font-size: 0.92rem; color: var(--text); }
+.review-date { font-size: 0.75rem; color: var(--text-muted); }
+.review-overall-badge { background: var(--star-fill); color: #1a1a1a; padding: 4px 12px; border-radius: 999px; font-weight: 800; font-size: 0.9rem; }
+.review-headline { font-size: 1.05rem; font-weight: 700; color: var(--accent); margin-bottom: 10px; }
+.score-chips-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.chip { background: var(--card-bg); border: 1px solid var(--border); padding: 3px 10px; border-radius: 6px; font-size: 0.78rem; color: var(--text-muted); }
+.review-body-text { color: var(--text); line-height: 1.6; font-size: 0.93rem; margin-bottom: 14px; }
+.like-review-btn { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-muted); padding: 6px 14px; border-radius: 999px; font-size: 0.82rem; font-weight: 600; }
+
+/* ----------------------------------------------------------------
+   35. OST Soundtrack Section
+   ---------------------------------------------------------------- */
+.ost-section-container {
+  margin: 36px 0;
+  background: var(--card-bg);
+  padding: 24px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+.ost-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+.ost-header h3 { font-size: 1.2rem; font-weight: 700; color: var(--text); }
+.ost-subtitle { font-size: 0.88rem; color: var(--text-muted); }
+.ost-external-links { display: flex; gap: 8px; }
+.ost-btn { padding: 7px 14px; border-radius: 999px; font-size: 0.82rem; font-weight: 700; color: #fff; text-decoration: none; }
+.ost-btn.spotify { background: #1DB954; }
+.ost-btn.youtube { background: #FF0000; }
+.ost-tracklist { display: flex; flex-direction: column; gap: 8px; }
+.ost-track-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--bg-alt);
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.track-number { font-weight: 800; color: var(--text-muted); font-size: 0.9rem; width: 20px; }
+.track-info { flex: 1; display: flex; flex-direction: column; }
+.track-title { font-size: 0.9rem; color: var(--text); }
+.track-artist { font-size: 0.78rem; color: var(--text-muted); }
+.track-duration { font-size: 0.82rem; color: var(--text-muted); }
+.track-play-btn { background: var(--accent-glow); color: var(--accent); border: 1px solid var(--accent); padding: 4px 12px; border-radius: 999px; font-size: 0.78rem; font-weight: 700; text-decoration: none; }
+
+/* ----------------------------------------------------------------
+   36. Advanced Filter Modal
+   ---------------------------------------------------------------- */
+.filter-modal-content {
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
+  width: min(540px, 90vw);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: slideDown 0.25s ease;
+}
+.filter-modal-header { display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--border); }
+.filter-modal-header h3 { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+.close-filter-btn { background: transparent; border: none; color: var(--text-muted); font-size: 1.2rem; }
+.filter-modal-body { padding: 24px; display: flex; flex-direction: column; gap: 20px; max-height: 70vh; overflow-y: auto; }
+.filter-group { display: flex; flex-direction: column; gap: 8px; }
+.filter-label { font-size: 0.9rem; font-weight: 700; color: var(--text); }
+.filter-select { background: var(--bg-alt); border: 1px solid var(--border); color: var(--text); padding: 10px 14px; border-radius: var(--radius-sm); font-size: 0.92rem; }
+.genre-chips-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.genre-chip { background: var(--bg-alt); border: 1px solid var(--border); color: var(--text-muted); padding: 6px 14px; border-radius: 999px; font-size: 0.82rem; font-weight: 600; }
+.genre-chip:hover { border-color: var(--accent); color: var(--accent); }
+.genre-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.rating-slider { width: 100%; accent-color: var(--accent); }
+.filter-modal-footer { display: flex; justify-content: space-between; padding: 16px 24px; border-top: 1px solid var(--border); background: var(--bg-alt); }
+.filter-reset-btn { background: transparent; border: 1px solid var(--border); color: var(--text-muted); padding: 9px 20px; border-radius: 999px; font-weight: 600; font-size: 0.88rem; }
+.filter-apply-btn { background: var(--accent); color: #fff; border: none; padding: 9px 24px; border-radius: 999px; font-weight: 700; font-size: 0.88rem; }
+
+/* ----------------------------------------------------------------
+   37. Airing Schedule Page
+   ---------------------------------------------------------------- */
+.schedule-day-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 12px; margin-bottom: 28px; }
+.schedule-tab-btn { flex: 0 0 auto; padding: 9px 20px; border-radius: 999px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text-muted); font-weight: 700; font-size: 0.9rem; }
+.schedule-tab-btn:hover { border-color: var(--accent); color: var(--accent); }
+.schedule-tab-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+.schedule-list { display: flex; flex-direction: column; gap: 14px; }
+.schedule-card { display: flex; align-items: center; gap: 20px; background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 16px 20px; cursor: pointer; transition: all 0.2s ease; }
+.schedule-card:hover { transform: translateX(4px); border-color: var(--accent); box-shadow: var(--shadow-sm); }
+.schedule-time-badge { background: var(--accent-glow); color: var(--accent); border: 1px solid var(--accent); padding: 6px 14px; border-radius: 999px; font-weight: 800; font-size: 0.85rem; flex-shrink: 0; }
+.schedule-info { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.schedule-country { font-size: 0.78rem; color: var(--text-muted); }
+.schedule-title { font-size: 1.05rem; font-weight: 700; color: var(--text); }
+.schedule-meta { font-size: 0.85rem; color: var(--text-muted); }
+.schedule-view-btn { background: var(--bg-alt); border: 1px solid var(--border); color: var(--text-muted); padding: 8px 16px; border-radius: 999px; font-weight: 600; font-size: 0.82rem; flex-shrink: 0; }
+
+/* ----------------------------------------------------------------
+   38. Profile & Stats Page
+   ---------------------------------------------------------------- */
+.profile-card { display: flex; gap: 24px; background: var(--card-bg); border: 1px solid var(--border); padding: 28px; border-radius: var(--radius-md); align-items: center; flex-wrap: wrap; }
+.profile-avatar-large { width: 80px; height: 80px; border-radius: 50%; background: var(--bg-alt); border: 2px solid var(--accent); display: flex; align-items: center; justify-content: center; font-size: 3rem; flex-shrink: 0; }
+.profile-info-block { flex: 1; }
+.profile-title-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 12px; }
+.profile-title-row h1 { font-size: 1.8rem; font-weight: 800; color: var(--text); }
+.edit-profile-btn { background: var(--bg-alt); border: 1px solid var(--border); color: var(--text-muted); padding: 7px 16px; border-radius: 999px; font-weight: 600; font-size: 0.85rem; }
+.profile-bio-text { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 6px; }
+.profile-joined { font-size: 0.78rem; color: var(--text-dim); }
+
+.profile-edit-form { background: var(--card-bg); border: 1px solid var(--border); padding: 24px; border-radius: var(--radius-md); margin-top: 20px; display: flex; flex-direction: column; gap: 14px; }
+.avatar-picker-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+.avatar-option-btn { background: var(--bg-alt); border: 1px solid var(--border); width: 44px; height: 44px; border-radius: 50%; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; }
+.avatar-option-btn.selected { border-color: var(--accent); background: var(--accent-glow); }
+.save-profile-btn { background: var(--accent); color: #fff; border: none; padding: 11px; border-radius: var(--radius-sm); font-weight: 700; font-size: 0.95rem; }
+
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+.stat-card { background: var(--card-bg); border: 1px solid var(--border); padding: 20px; border-radius: var(--radius-md); display: flex; flex-direction: column; align-items: center; text-align: center; }
+.stat-icon { font-size: 2rem; margin-bottom: 6px; }
+.stat-number { font-size: 2.2rem; font-weight: 900; color: var(--accent); }
+.stat-label { font-size: 0.85rem; color: var(--text-muted); font-weight: 600; }
+
+.activity-list { display: flex; flex-direction: column; gap: 10px; }
+.activity-item-card { display: flex; align-items: center; gap: 14px; background: var(--card-bg); border: 1px solid var(--border); padding: 14px 18px; border-radius: var(--radius-sm); }
+.activity-icon { font-size: 1.4rem; }
+.activity-info { display: flex; flex-direction: column; }
+.activity-info strong { font-size: 0.92rem; color: var(--text); }
+.activity-info span { font-size: 0.82rem; color: var(--text-muted); }
+
+/* ----------------------------------------------------------------
+   39. Custom Lists & Playlists Page
+   ---------------------------------------------------------------- */
+.lists-page-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; }
+.create-list-btn { background: var(--accent); color: #fff; border: none; padding: 11px 24px; border-radius: 999px; font-weight: 700; font-size: 0.92rem; }
+.lists-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+.custom-list-card { background: var(--card-bg); border: 1px solid var(--border); padding: 22px; border-radius: var(--radius-md); display: flex; flex-direction: column; gap: 12px; }
+.list-card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.list-card-title { font-size: 1.1rem; font-weight: 700; color: var(--text); }
+.official-badge { background: var(--star-fill); color: #1a1a1a; padding: 3px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 800; flex-shrink: 0; }
+.list-card-desc { font-size: 0.88rem; color: var(--text-muted); line-height: 1.55; flex: 1; }
+.list-card-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border); padding-top: 12px; }
+.list-author { font-size: 0.8rem; color: var(--text-dim); }
+.like-list-btn { background: var(--bg-alt); border: 1px solid var(--border); color: var(--accent2); padding: 5px 14px; border-radius: 999px; font-weight: 700; font-size: 0.82rem; }
+
+/* ----------------------------------------------------------------
+   40. Mobile Responsive Tweaks for New Components
+   ---------------------------------------------------------------- */
+@media (max-width: 600px) {
+  .sliders-grid { grid-template-columns: 1fr; }
+  .schedule-card { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .schedule-view-btn { width: 100%; text-align: center; }
+  .profile-card { flex-direction: column; text-align: center; }
+  .profile-title-row { justify-content: center; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .lists-grid { grid-template-columns: 1fr; }
+  .streaming-badges-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ----------------------------------------------------------------
+   41. Now Airing Broadcasts Section (Clean & Elegant Theme)
+   ---------------------------------------------------------------- */
+.now-airing-section {
+  margin-top: 12px;
+  margin-bottom: 36px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  padding: 22px 24px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  transition: background 0.3s, border-color 0.3s;
+}
+
+.now-airing-status-tag {
+  display: inline-block;
+  background: var(--accent-glow);
+  color: var(--accent);
+  border: 1px solid var(--border);
+  padding: 4px 14px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.now-airing-scroll {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 4px 2px 14px 2px;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+}
+
+.now-airing-scroll::-webkit-scrollbar {
+  height: 5px;
+}
+
+.now-airing-scroll::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 999px;
+}
+
+.now-airing-card {
+  flex: 0 0 155px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+  display: flex;
+  flex-direction: column;
+}
+
+.now-airing-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent);
+}
+
+.now-airing-poster {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  overflow: hidden;
+}
+
+.now-airing-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  transition: transform 0.4s ease;
+}
+
+.now-airing-card:hover .now-airing-poster img {
+  transform: scale(1.04);
+}
+
+.now-airing-info {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+  background: var(--card-bg);
+}
+
+.now-airing-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+}
+
+.now-airing-subtext {
+  font-size: 0.75rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+@media (max-width: 600px) {
+  .now-airing-section { padding: 16px; border-radius: var(--radius-md); }
+  .now-airing-card { flex: 0 0 125px; }
+  .now-airing-poster { height: 175px; }
+  .now-airing-title { font-size: 0.82rem; }
+}
+
+/* ----------------------------------------------------------------
+   42. Footer Component
+   ---------------------------------------------------------------- */
+.site-footer {
+  background: var(--card-bg);
+  border-top: 1px solid var(--border);
+  margin-top: 60px;
+  padding: 48px 20px 24px;
+  transition: background 0.3s;
+}
+
+.footer-container {
+  max-width: 1280px;
+  margin: 0 auto 36px;
+  display: grid;
+  grid-template-columns: 2fr 1.8fr 1.4fr;
+  gap: 36px;
+}
+
+.footer-brand-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.footer-logo-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: fit-content;
+}
+
+.footer-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.footer-site-name {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--accent);
+}
+
+.footer-tagline {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.footer-social-row {
+  display: flex;
+  gap: 10px;
+}
+
+.social-icon-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+.social-icon-btn:hover {
+  background: var(--accent-glow);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.footer-links-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.footer-heading {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.footer-links-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.footer-links-list a {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  transition: color 0.2s ease;
+}
+.footer-links-list a:hover {
+  color: var(--accent);
+}
+
+.footer-community-text {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+  margin-bottom: 12px;
+}
+
+.footer-cta-btn {
+  display: inline-block;
+  background: var(--accent);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-align: center;
+  width: fit-content;
+  transition: opacity 0.2s ease;
+}
+.footer-cta-btn:hover { opacity: 0.85; }
+
+.footer-bottom {
+  max-width: 1280px;
+  margin: 0 auto;
+  border-top: 1px solid var(--border);
+  padding-top: 20px;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+}
+
+/* ----------------------------------------------------------------
+   43. Surprise Me Modal (Random Drama Picker)
+   ---------------------------------------------------------------- */
+.surprise-modal-content {
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  width: min(480px, 92vw);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  padding: 28px;
+  position: relative;
+  text-align: center;
+  animation: slideDown 0.25s ease;
+}
+
+.surprise-header { margin-bottom: 20px; }
+.surprise-icon { font-size: 3rem; display: block; margin-bottom: 6px; }
+.surprise-header h3 { font-size: 1.3rem; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.surprise-header p { font-size: 0.88rem; color: var(--text-muted); }
+
+.surprise-card {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  gap: 16px;
+  text-align: left;
+  margin-bottom: 24px;
+  transition: transform 0.2s ease;
+}
+.surprise-card.spinning {
+  animation: pulse-logo 0.15s ease-in-out infinite alternate;
+}
+
+.surprise-poster-wrapper {
+  position: relative;
+  width: 110px;
+  height: 160px;
+  flex-shrink: 0;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.surprise-poster-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.surprise-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.surprise-title { font-size: 1.05rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.surprise-overview { font-size: 0.82rem; color: var(--text-muted); line-height: 1.5; }
+
+.surprise-actions { display: flex; gap: 12px; justify-content: center; }
+.surprise-reroll-btn {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+.surprise-reroll-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+.surprise-watch-btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+/* ----------------------------------------------------------------
+   44. Breadcrumbs Component
+   ---------------------------------------------------------------- */
+.breadcrumbs-nav {
+  margin-bottom: 18px;
+}
+.breadcrumbs-list {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+}
+.breadcrumb-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-muted);
+}
+.breadcrumb-item a {
+  color: var(--text-muted);
+  transition: color 0.2s ease;
+}
+.breadcrumb-item a:hover {
+  color: var(--accent);
+}
+.breadcrumb-separator {
+  color: var(--text-dim);
+  font-size: 0.75rem;
+}
+.breadcrumb-current {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+@media (max-width: 900px) {
+  .footer-container { grid-template-columns: 1fr 1fr; gap: 28px; }
+}
+@media (max-width: 600px) {
+  .footer-container { grid-template-columns: 1fr; }
+}
+
+/* ----------------------------------------------------------------
+   45. Detail Title Row, Watchlist & Share Buttons
+   ---------------------------------------------------------------- */
+.detail-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.detail-title-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.watchlist-btn {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  border-radius: 999px;
+  padding: 8px 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.watchlist-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+.watchlist-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.share-btn {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 999px;
+  padding: 8px 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.share-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+.share-btn.copied {
+  color: #3fb950;
+  border-color: #3fb950;
+}
+
+/* ----------------------------------------------------------------
+   46. Episode Guide & Seasons Breakdown
+   ---------------------------------------------------------------- */
+.episode-guide-section {
+  margin: 36px 0;
+  background: var(--card-bg);
+  padding: 24px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  transition: background 0.3s;
+}
+.episode-guide-section h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+
+.seasons-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.season-block {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+}
+
+.season-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.season-toggle:hover {
+  background: var(--card-hover);
+}
+.season-toggle-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+}
+.season-thumb {
+  width: 42px;
+  height: 58px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  flex-shrink: 0;
+}
+.season-name {
+  display: block;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.season-ep-count {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.season-chevron {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.episodes-list {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  background: var(--card-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.episode-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.episode-row:last-child {
+  border-bottom: none;
+}
+.ep-number {
+  background: var(--accent-glow);
+  color: var(--accent);
+  font-weight: 800;
+  font-size: 0.78rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+.ep-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ep-name {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text);
+}
+.ep-date {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+.ep-overview {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin-top: 4px;
+}
+.ep-rating {
+  color: var(--star-fill);
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+/* ----------------------------------------------------------------
+   47. Similar Dramas & Movies Section
+   ---------------------------------------------------------------- */
+.similar-section {
+  margin: 36px 0;
+  background: var(--card-bg);
+  padding: 24px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+.similar-section h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 20px;
+}
+
+.similar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+}
+
+.similar-card {
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+}
+.similar-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-sm);
+  border-color: var(--accent);
+}
+
+.similar-poster {
+  position: relative;
+  height: 220px;
+  overflow: hidden;
+}
+.similar-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top;
+  transition: transform 0.4s ease;
+}
+.similar-card:hover .similar-poster img {
+  transform: scale(1.04);
+}
+.similar-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--bg-alt), var(--card-bg));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+.similar-title {
+  padding: 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ----------------------------------------------------------------
+   48. Modal Overlay & Clean Filter Buttons
+   ---------------------------------------------------------------- */
+.surprise-me-btn {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+.surprise-me-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+
+.advanced-filter-btn {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+.advanced-filter-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 990;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.modal-close-btn:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+/* ----------------------------------------------------------------
+   49. Mobile Responsiveness Adjustments
+   ---------------------------------------------------------------- */
+@media (max-width: 600px) {
+  .detail-title-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .detail-title-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .similar-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  .similar-poster {
+    height: 180px;
+  }
+  .episode-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}
+
+/* ----------------------------------------------------------------
+   50. Refined Filter Bar Left/Right & Action Button Styles
+   ---------------------------------------------------------------- */
+.filter-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.filter-categories-left {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  width: 100%;
+  scrollbar-width: none;
+}
+.filter-categories-left::-webkit-scrollbar { display: none; }
+
+.filter-actions-right {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.surprise-me-btn {
+  background: rgba(136, 90, 246, 0.12) !important;
+  border: 1px solid rgba(136, 90, 246, 0.3) !important;
+  color: var(--text) !important;
+  font-weight: 600 !important;
+}
+.surprise-me-btn:hover {
+  background: rgba(136, 90, 246, 0.25) !important;
+  border-color: rgba(136, 90, 246, 0.6) !important;
+  transform: translateY(-2px);
+}
+
+.advanced-filter-btn {
+  background: rgba(45, 212, 191, 0.12) !important;
+  border: 1px solid rgba(45, 212, 191, 0.3) !important;
+  color: var(--text) !important;
+  font-weight: 600 !important;
+}
+.advanced-filter-btn:hover {
+  background: rgba(45, 212, 191, 0.25) !important;
+  border-color: rgba(45, 212, 191, 0.6) !important;
+  transform: translateY(-2px);
+}
+
+/* ----------------------------------------------------------------
+   51. Hero Carousel Full Responsiveness Fixes
+   ---------------------------------------------------------------- */
+.hero-section-labels {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  bottom: auto;
+  display: flex;
+  gap: 6px;
+  z-index: 10;
+}
+
+.label-recent, .label-upcoming {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  backdrop-filter: blur(8px);
+}
+
+@media (max-width: 768px) {
+  .hero-carousel {
+    height: 320px;
+    border-radius: var(--radius-md);
+  }
+  .hero-content {
+    padding: 20px 24px;
+    max-width: 85%;
+  }
+  .hero-title {
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+  }
+  .hero-overview {
+    font-size: 0.85rem;
+    -webkit-line-clamp: 2;
+    margin-bottom: 12px;
+  }
+  .hero-meta {
+    margin-bottom: 14px;
+    gap: 10px;
+  }
+  .hero-cta {
+    padding: 8px 18px;
+    font-size: 0.85rem;
+  }
+  .hero-section-labels {
+    top: 12px;
+    right: 12px;
+  }
+  .label-recent, .label-upcoming {
+    font-size: 0.65rem;
+    padding: 2px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-carousel {
+    height: 260px;
+  }
+  .hero-content {
+    padding: 14px 16px;
+    max-width: 90%;
+  }
+  .hero-badge {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    margin-bottom: 8px;
+  }
+  .hero-title {
+    font-size: 1.1rem;
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+  .hero-overview {
+    display: none;
+  }
+  .hero-meta {
+    margin-bottom: 10px;
+  }
+  .hero-arrow {
+    width: 32px;
+    height: 32px;
+  }
+  .hero-prev { left: 8px; }
+  .hero-next { right: 8px; }
+  .hero-section-labels { display: none; }
+}
+
+/* ----------------------------------------------------------------
+   52. Footer Links Grid Side-by-Side (Mobile & Tablet)
+   ---------------------------------------------------------------- */
+.footer-nav-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+@media (max-width: 900px) {
+  .footer-container {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  .footer-nav-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+}
+
+/* ----------------------------------------------------------------
+   53. Responsive Now Airing Mobile Grid Tweaks
+   ---------------------------------------------------------------- */
+@media (max-width: 600px) {
+  .now-airing-section {
+    padding: 14px;
+    margin-bottom: 24px;
+  }
+  .now-airing-scroll {
+    gap: 12px;
+    padding: 2px 0 10px 0;
+  }
+  .now-airing-card {
+    flex: 0 0 120px;
+    border-radius: var(--radius-sm);
+  }
+  .now-airing-poster {
+    height: 165px;
+  }
+  .now-airing-info {
+    padding: 8px 10px;
+  }
+  .now-airing-title {
+    font-size: 0.8rem;
+  }
+  .now-airing-subtext {
+    font-size: 0.7rem;
+  }
 }

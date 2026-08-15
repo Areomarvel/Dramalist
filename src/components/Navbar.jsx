@@ -86,7 +86,11 @@ const Navbar = ({ toggleTheme, isDarkMode }) => {
   const navLinks = [
     { to: '/', label: '🏠 Home' },
     { to: '/upcoming', label: '📅 Upcoming' },
+    { to: '/schedule', label: '📆 Airing Schedule' },
+    { to: '/watchlist', label: '🔖 My Watchlist' },
+    { to: '/lists', label: '📜 Curated Lists' },
     { to: '/forum', label: '💬 Forum' },
+    { to: '/profile', label: '👤 Profile & Stats' },
   ];
 
   return (

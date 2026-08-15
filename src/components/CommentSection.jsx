@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+const CLEANUP_FLAG = 'adw_comments_cleaned_v1';
+
 const CommentSection = ({ targetId, type = 'drama' }) => {
   const storageKey = `comments_${type}_${targetId}`;
 
@@ -9,9 +11,31 @@ const CommentSection = ({ targetId, type = 'drama' }) => {
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
+    // One-time cleanup: remove any fake/seeded comments from previous dev sessions.
+    // Real user comments have a numeric timestamp `id` (Date.now()).
+    // We wipe any stored data on first run after this update and start fresh.
+    if (!localStorage.getItem(CLEANUP_FLAG)) {
+      // Clear all comment keys from localStorage
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('comments_')) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(k => localStorage.removeItem(k));
+      localStorage.setItem(CLEANUP_FLAG, '1');
+      setComments([]);
+      return;
+    }
+
     const saved = localStorage.getItem(storageKey);
     if (saved) {
-      setComments(JSON.parse(saved));
+      try {
+        setComments(JSON.parse(saved));
+      } catch {
+        setComments([]);
+      }
     } else {
       setComments([]);
     }
@@ -33,6 +57,12 @@ const CommentSection = ({ targetId, type = 'drama' }) => {
     setNewComment('');
     setSubmitted(true);
     setTimeout(() => setSubmitted(false), 3000);
+    localStorage.setItem(storageKey, JSON.stringify(updatedComments));
+  };
+
+  const handleDelete = (commentId) => {
+    const updatedComments = comments.filter(c => c.id !== commentId);
+    setComments(updatedComments);
     localStorage.setItem(storageKey, JSON.stringify(updatedComments));
   };
 
@@ -86,6 +116,14 @@ const CommentSection = ({ targetId, type = 'drama' }) => {
                 <div className="comment-header">
                   <strong className="comment-username">{comment.user}</strong>
                   <span className="comment-date">{comment.date}</span>
+                  <button
+                    className="comment-delete-btn"
+                    onClick={() => handleDelete(comment.id)}
+                    aria-label="Delete comment"
+                    title="Delete comment"
+                  >
+                    ✕
+                  </button>
                 </div>
                 <p className="comment-text">{comment.text}</p>
               </div>
