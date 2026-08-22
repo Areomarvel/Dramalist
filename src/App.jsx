@@ -1,5 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import AuthModal from './components/AuthModal';
 import Home from './pages/Home';
 import DramaDetail from './pages/DramaDetail';
 import MovieDetail from './pages/MovieDetail';
@@ -18,23 +20,23 @@ import BackToTop from './components/BackToTop';
 import Footer from './components/Footer';
 import './App.css';
 
-function AppContent({ isDarkMode, toggleTheme }) {
+function AppContent() {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true);
-  const [prevLocation, setPrevLocation] = useState(location.key);
+  const prevLocationKey = useRef(location.key);
 
   // Show loading screen on route changes
   useEffect(() => {
-    if (location.key !== prevLocation) {
+    if (location.key !== prevLocationKey.current) {
+      prevLocationKey.current = location.key;
       setIsLoading(true);
-      setPrevLocation(location.key);
     }
   }, [location.key]);
 
   return (
     <>
       {isLoading && <LoadingScreen onDone={() => setIsLoading(false)} />}
-      <Navbar toggleTheme={toggleTheme} isDarkMode={isDarkMode} />
+      <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/drama/:id" element={<DramaDetail />} />
@@ -49,6 +51,7 @@ function AppContent({ isDarkMode, toggleTheme }) {
         <Route path="/lists" element={<CustomLists />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      <AuthModal />
       <Footer />
       <BackToTop />
     </>
@@ -56,29 +59,10 @@ function AppContent({ isDarkMode, toggleTheme }) {
 }
 
 function App() {
-  const [isDarkMode, setIsDarkMode] = useState(true);
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light') {
-      setIsDarkMode(false);
-      document.body.classList.add('light-mode');
-    }
-  }, []);
-
-  const toggleTheme = () => {
-    if (isDarkMode) {
-      document.body.classList.add('light-mode');
-      localStorage.setItem('theme', 'light');
-    } else {
-      document.body.classList.remove('light-mode');
-      localStorage.setItem('theme', 'dark');
-    }
-    setIsDarkMode(!isDarkMode);
-  };
-
   return (
-    <AppContent isDarkMode={isDarkMode} toggleTheme={toggleTheme} />
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 

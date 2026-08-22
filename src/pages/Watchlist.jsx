@@ -1,29 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatTitle } from '../utils/translateTitle';
 import WatchlistButton from '../components/WatchlistButton';
+import { useAuth } from '../context/AuthContext';
 
 const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
-const STORAGE_KEY = 'adw_watchlist';
 
 const Watchlist = () => {
   const navigate = useNavigate();
-  const [watchlist, setWatchlist] = useState([]);
-
-  const loadList = () => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      setWatchlist(raw ? JSON.parse(raw) : []);
-    } catch {
-      setWatchlist([]);
-    }
-  };
-
-  useEffect(() => {
-    loadList();
-    window.addEventListener('adw_watchlist_change', loadList);
-    return () => window.removeEventListener('adw_watchlist_change', loadList);
-  }, []);
+  const { watchlist, user, openAuthModal } = useAuth();
 
   const handleCardClick = (item) => {
     if (item.media_type === 'movie') {
@@ -38,10 +23,20 @@ const Watchlist = () => {
       <div className="watchlist-header">
         <h1 className="watchlist-title">🔖 My Watchlist</h1>
         <p className="watchlist-subtitle">
-          {watchlist.length > 0
-            ? `${watchlist.length} title${watchlist.length !== 1 ? 's' : ''} saved`
-            : 'Your saved dramas & movies will appear here'}
+          {user
+            ? `Synced with your account (${user.username})`
+            : 'Saved locally in your browser (Sign in to sync across devices)'}
         </p>
+        {!user && (
+          <button
+            type="button"
+            className="watchlist-sync-btn"
+            onClick={() => openAuthModal('register')}
+            id="watchlist-sync-btn"
+          >
+            ☁️ Sign in to Sync to Cloud Database
+          </button>
+        )}
       </div>
 
       {watchlist.length === 0 ? (
@@ -55,18 +50,18 @@ const Watchlist = () => {
         </div>
       ) : (
         <div className="watchlist-grid">
-          {watchlist.map(item => {
+          {watchlist.map((item) => {
             const title = formatTitle(
               item.name || item.title,
               item.original_name || item.original_title
-            ) || item.name || item.title;
+            ) || item.name || item.title || 'Untitled';
             const poster = item.poster_path ? `${IMAGE_BASE_URL}${item.poster_path}` : null;
             const year = item.first_air_date || item.release_date
               ? new Date(item.first_air_date || item.release_date).getFullYear()
               : null;
 
             return (
-              <div key={`${item.media_type}-${item.id}`} className="watchlist-card" onClick={() => handleCardClick(item)}>
+              <div key={`${item.media_type || 'tv'}-${item.id}`} className="watchlist-card" onClick={() => handleCardClick(item)}>
                 <div className="watchlist-poster">
                   {poster ? (
                     <img src={poster} alt={title} loading="lazy" />
@@ -99,3 +94,4 @@ const Watchlist = () => {
 };
 
 export default Watchlist;
+

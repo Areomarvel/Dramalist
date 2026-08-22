@@ -1,53 +1,107 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useUserProfile } from '../utils/useUserProfile';
-import { useProgressTracker } from '../utils/useProgressTracker';
-
-const AVATARS = ['🎭', '🌸', '🍿', '🎬', '🇰🇷', '🇨🇳', '🇯🇵', '🇹🇭', '⭐', '🐲'];
+import { useAuth } from '../context/AuthContext';
 
 const Profile = () => {
-  const { profile, updateProfile } = useUserProfile();
-  const { allProgress } = useProgressTracker();
-  const navigate = useNavigate();
+  const { user, logout, openAuthModal, watchlist, updateProfile: saveUserProfile } = useAuth();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState(profile.name);
-  const [bio, setBio] = useState(profile.bio);
-  const [avatar, setAvatar] = useState(profile.avatar);
+  const [username, setUsername] = useState(user?.username || '');
+  const [bio, setBio] = useState(user?.bio || '');
+  const [saveLoading, setSaveLoading] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState('');
 
-  const progressList = Object.values(allProgress);
-  const completedCount = progressList.filter(p => p.status === 'completed').length;
-  const watchingCount = progressList.filter(p => p.status === 'watching').length;
-  const planToWatchCount = progressList.filter(p => p.status === 'plan_to_watch').length;
+  const completedCount = watchlist.filter(p => p.status === 'completed').length;
+  const watchingCount = watchlist.filter(p => p.status === 'watching' || !p.status).length;
+  const planToWatchCount = watchlist.filter(p => p.status === 'plan_to_watch').length;
 
-  // Calculate estimated watch hours (assuming avg 1 hr per ep)
-  const totalEpsWatched = progressList.reduce((sum, p) => sum + (p.currentEpisode || 0), 0);
-  const totalWatchHours = Math.round(totalEpsWatched * 1.1);
+  const totalWatchHours = Math.round(watchlist.length * 16 * 1.1);
 
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     e.preventDefault();
-    updateProfile({ name, bio, avatar });
-    setIsEditing(false);
+    setSaveLoading(true);
+    try {
+      await saveUserProfile({ username: username.trim(), bio: bio.trim() });
+      setSaveSuccess('Profile updated successfully!');
+      setIsEditing(false);
+      setTimeout(() => setSaveSuccess(''), 3000);
+    } catch (err) {
+      alert(err.message || 'Failed to update profile');
+    } finally {
+      setSaveLoading(false);
+    }
   };
+
+  if (!user) {
+    return (
+      <div className="app-container">
+        <div className="profile-guest-card">
+          <div className="guest-avatar-large">👤</div>
+          <h2>Join AsianDramaWiki Community</h2>
+          <p>
+            Create an account or sign in to sync your drama watchlist across all devices,
+            track episode progress, and share ratings with fellow fans.
+          </p>
+          <div className="guest-auth-actions">
+            <button
+              type="button"
+              className="guest-btn signin-btn"
+              onClick={() => openAuthModal('login')}
+              id="guest-signin-btn"
+            >
+              Sign In to Your Account
+            </button>
+            <button
+              type="button"
+              className="guest-btn signup-btn"
+              onClick={() => openAuthModal('register')}
+              id="guest-signup-btn"
+            >
+              Create Free Account
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="app-container">
+      {saveSuccess && <div className="auth-success-banner">✨ {saveSuccess}</div>}
+
       {/* Profile Header Banner */}
       <div className="profile-card">
-        <div className="profile-avatar-large">{profile.avatar || '🎭'}</div>
+        <img
+          src={user.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(user.username)}`}
+          alt={user.username}
+          className="profile-avatar-img"
+        />
         <div className="profile-info-block">
           <div className="profile-title-row">
-            <h1>{profile.name}</h1>
-            <button
-              type="button"
-              className="edit-profile-btn"
-              onClick={() => setIsEditing(v => !v)}
-            >
-              {isEditing ? '✕ Cancel' : '✏️ Edit Profile'}
-            </button>
+            <div>
+              <h1>{user.username}</h1>
+              <span className="profile-email-badge">{user.email}</span>
+            </div>
+            <div className="profile-actions-row">
+              <button
+                type="button"
+                className="edit-profile-btn"
+                onClick={() => setIsEditing(v => !v)}
+              >
+                {isEditing ? '✕ Cancel' : '✏️ Edit Profile'}
+              </button>
+              <button
+                type="button"
+                className="logout-profile-btn"
+                onClick={logout}
+              >
+                🚪 Sign Out
+              </button>
+            </div>
           </div>
-          <p className="profile-bio-text">{profile.bio}</p>
-          <span className="profile-joined">Member since {profile.joinedDate}</span>
+          <p className="profile-bio-text">{user.bio || 'Asian drama enthusiast & binge watcher.'}</p>
+          <span className="profile-joined">
+            Member since {new Date(user.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+          </span>
         </div>
       </div>
 
@@ -56,25 +110,11 @@ const Profile = () => {
         <form onSubmit={handleSave} className="profile-edit-form">
           <h3>Edit Profile Information</h3>
 
-          <label className="form-label">Avatar Emoji:</label>
-          <div className="avatar-picker-grid">
-            {AVATARS.map(a => (
-              <button
-                key={a}
-                type="button"
-                className={`avatar-option-btn ${avatar === a ? 'selected' : ''}`}
-                onClick={() => setAvatar(a)}
-              >
-                {a}
-              </button>
-            ))}
-          </div>
-
-          <label className="form-label">Display Name:</label>
+          <label className="form-label">Username:</label>
           <input
             type="text"
-            value={name}
-            onChange={e => setName(e.target.value)}
+            value={username}
+            onChange={e => setUsername(e.target.value)}
             required
             className="profile-input"
           />
@@ -87,8 +127,8 @@ const Profile = () => {
             className="profile-input"
           />
 
-          <button type="submit" className="save-profile-btn">
-            Save Changes
+          <button type="submit" className="save-profile-btn" disabled={saveLoading}>
+            {saveLoading ? 'Saving…' : 'Save Changes'}
           </button>
         </form>
       )}
@@ -99,7 +139,7 @@ const Profile = () => {
         <div className="stat-card">
           <span className="stat-icon">⏱️</span>
           <span className="stat-number">{totalWatchHours}</span>
-          <span className="stat-label">Hours Watched</span>
+          <span className="stat-label">Est. Hours Watched</span>
         </div>
         <div className="stat-card">
           <span className="stat-icon">✅</span>
@@ -118,23 +158,25 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* Recent Activity List */}
-      <h2 className="section-title" style={{ marginTop: '36px' }}>📜 Recent Activity</h2>
+      {/* My Watchlist Quick Overview */}
+      <h2 className="section-title" style={{ marginTop: '36px' }}>📜 My Watchlist ({watchlist.length})</h2>
       <div className="activity-list">
-        {progressList.length === 0 ? (
-          <p className="no-content-msg">No watching activity recorded yet. Start tracking dramas to see stats!</p>
+        {watchlist.length === 0 ? (
+          <p className="no-content-msg">No dramas in your watchlist yet. Browse dramas and click "Add to Watchlist"!</p>
         ) : (
-          progressList.map((item, idx) => (
-            <div key={idx} className="activity-item-card">
+          watchlist.slice(0, 10).map((item) => (
+            <div key={item.id} className="activity-item-card">
               <span className="activity-icon">
                 {item.status === 'completed' ? '✅' : '📺'}
               </span>
               <div className="activity-info">
-                <strong>{item.title || 'Drama Title'}</strong>
+                <strong>{item.title}</strong>
                 <span>
                   {item.status === 'completed'
-                    ? 'Completed all episodes!'
-                    : `Currently on Episode ${item.currentEpisode || 1} / ${item.totalEpisodes || '?'}`}
+                    ? 'Status: Completed'
+                    : item.status === 'plan_to_watch'
+                    ? 'Status: Plan to Watch'
+                    : 'Status: Currently Watching'}
                 </span>
               </div>
             </div>
@@ -146,3 +188,4 @@ const Profile = () => {
 };
 
 export default Profile;
+

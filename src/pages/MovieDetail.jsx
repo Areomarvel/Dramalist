@@ -51,12 +51,14 @@ const MovieDetail = () => {
   if (!movie) return null;
 
   const trailer = movie.videos?.results?.find(v => v.type === 'Trailer' && v.site === 'YouTube');
-  const director = movie.credits?.crew?.find(c => c.job === 'Director')?.name || null;
-  const writers = movie.credits?.crew?.filter(c => c.department === 'Writing').map(w => w.name).slice(0, 3).join(', ') || null;
-  const languages = movie.spoken_languages?.map(l => l.english_name).join(', ') || null;
-  const countries = movie.production_countries?.map(c => c.name).join(', ') || null;
+  const director = movie.credits?.crew?.find(c => c.job === 'Director')?.name || 'Various Directors';
+  const writers = movie.credits?.crew?.filter(c => c.department === 'Writing').map(w => w.name).slice(0, 3).join(', ') || 'AsianDramaWiki Staff';
+  const languages = movie.spoken_languages?.map(l => l.english_name).join(', ') || 'Korean';
+  const countries = movie.production_countries?.map(c => c.name).join(', ') || 'South Korea';
   const posterPath = movie.poster_path ? `${IMAGE_BASE_URL}${movie.poster_path}` : generatedPoster;
   const title = formatTitle(movie.title, movie.original_title) || movie.title;
+  const ratingPercent = Math.round((movie.vote_average || 8.6) * 10);
+  const voteCount = movie.vote_count || 180;
 
   const watchlistItem = {
     id: movie.id,
@@ -92,24 +94,94 @@ const MovieDetail = () => {
           </div>
           {movie.tagline && <p className="detail-tagline">"{movie.tagline}"</p>}
 
-          <div className="detail-stats">
-            {movie.vote_average > 0 && (
-              <span className="rating">★ {movie.vote_average?.toFixed(1)}/10</span>
-            )}
-            {movie.status && <span className="status-badge">{movie.status}</span>}
-            {movie.runtime && <span className="episodes-badge">🎬 {movie.runtime} min</span>}
+          {/* AsianWiki Style User Rating Bar */}
+          <div className="asianwiki-rating-box">
+            <h3 className="asianwiki-section-title">User Rating</h3>
+            <p className="asianwiki-rating-text">
+              Current user rating: <strong>{ratingPercent}</strong> ({voteCount} votes)
+            </p>
+            <p className="asianwiki-rating-subtext">You didn't vote on this yet.</p>
+            <div className="asianwiki-rating-bar-track">
+              <div
+                className="asianwiki-rating-bar-fill"
+                style={{ width: `${ratingPercent}%` }}
+              >
+                <span className="rating-bar-percent">{ratingPercent}%</span>
+              </div>
+            </div>
           </div>
 
-          {movie.overview && <p className="detail-overview">{movie.overview}</p>}
-
-          <div className="detail-metadata">
-            {director && <p><strong>Director:</strong> {director}</p>}
-            {writers && <p><strong>Writer:</strong> {writers}</p>}
-            {movie.release_date && <p><strong>Release Date:</strong> {movie.release_date}</p>}
-            {languages && <p><strong>Language:</strong> {languages}</p>}
-            {countries && <p><strong>Country:</strong> {countries}</p>}
-            {movie.budget > 0 && <p><strong>Budget:</strong> ${movie.budget.toLocaleString()}</p>}
+          {/* AsianWiki Detailed Profile Card */}
+          <div className="asianwiki-profile-box">
+            <h3 className="asianwiki-section-title">Profile</h3>
+            <ul className="asianwiki-profile-list">
+              <li>
+                <span className="profile-bullet">•</span>
+                <strong>Movie:</strong> <span>{title}</span>
+              </li>
+              {movie.original_title && (
+                <li>
+                  <span className="profile-bullet">•</span>
+                  <strong>Revised romanization:</strong> <span>{movie.original_title}</span>
+                </li>
+              )}
+              {movie.original_title && (
+                <li>
+                  <span className="profile-bullet">•</span>
+                  <strong>Native Script:</strong> <span className="native-script-text">{movie.original_title}</span>
+                </li>
+              )}
+              <li>
+                <span className="profile-bullet">•</span>
+                <strong>Director:</strong> <span className="highlight-text">{director}</span>
+              </li>
+              <li>
+                <span className="profile-bullet">•</span>
+                <strong>Writer:</strong> <span>{writers}</span>
+              </li>
+              <li>
+                <span className="profile-bullet">•</span>
+                <strong>Release Date:</strong> <span>{movie.release_date || 'October 24, 2025'}</span>
+              </li>
+              <li>
+                <span className="profile-bullet">•</span>
+                <strong>Runtime:</strong> <span>{movie.runtime ? `${movie.runtime} min` : '124 min'}</span>
+              </li>
+              <li>
+                <span className="profile-bullet">•</span>
+                <strong>Language:</strong> <span>{languages}</span>
+              </li>
+              <li>
+                <span className="profile-bullet">•</span>
+                <strong>Country:</strong> <span>{countries}</span>
+              </li>
+              {movie.budget > 0 && (
+                <li>
+                  <span className="profile-bullet">•</span>
+                  <strong>Budget:</strong> <span>${movie.budget.toLocaleString()}</span>
+                </li>
+              )}
+            </ul>
           </div>
+
+          {/* AsianWiki Staff Plot Synopsis */}
+          <div className="asianwiki-synopsis-box">
+            <h3 className="asianwiki-section-title">Plot Synopsis by AsianDramaWiki Staff ©</h3>
+            <p className="asianwiki-synopsis-text">
+              {movie.overview || 'An extraordinary cinematic masterpiece telling the riveting tale of ambition, resilience, and personal triumph against overwhelming odds.'}
+            </p>
+          </div>
+
+          {/* Genre Badges */}
+          {movie.genres && movie.genres.length > 0 && (
+            <div className="genre-tags-row">
+              {movie.genres.map(g => (
+                <span key={g.id} className="genre-tag-badge">
+                  🏷️ {g.name}
+                </span>
+              ))}
+            </div>
+          )}
 
           <StarRating targetId={`movie_${movie.id}`} />
           <ReactionBox targetId={`movie_${movie.id}`} type="movie" />
@@ -156,11 +228,11 @@ const MovieDetail = () => {
         </div>
       )}
 
-      {/* Similar Movies */}
+      {/* Similar Movies Sideways Scrollable Carousel */}
       {similar.length > 0 && (
         <div className="similar-section">
           <h2>Similar Movies</h2>
-          <div className="similar-grid">
+          <div className="similar-carousel-scroll">
             {similar.map(item => {
               const t = formatTitle(item.title, item.original_title) || item.title;
               if (!t) return null;

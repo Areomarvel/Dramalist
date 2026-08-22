@@ -45,9 +45,8 @@ const DramaCard = ({ drama = {} }) => {
   const title = formatTitle(
     drama.name || drama.title,
     drama.original_name || drama.original_title
-  );
+  ) || drama.name || drama.title || drama.original_name || drama.original_title || 'Untitled';
 
-  if (!title) return null;
 
   const isMovie = drama.media_type === 'movie' || (!drama.first_air_date && drama.release_date);
 

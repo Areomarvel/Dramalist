@@ -1,50 +1,33 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 
 const SearchIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
     <circle cx="11" cy="11" r="8"/>
     <line x1="21" y1="21" x2="16.65" y2="16.65"/>
   </svg>
 );
 
 const CloseIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
     <line x1="18" y1="6" x2="6" y2="18"/>
     <line x1="6" y1="6" x2="18" y2="18"/>
   </svg>
 );
 
 const HamburgerIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
     <line x1="3" y1="6" x2="21" y2="6"/>
     <line x1="3" y1="12" x2="21" y2="12"/>
     <line x1="3" y1="18" x2="21" y2="18"/>
   </svg>
 );
 
-const SunIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-    <circle cx="12" cy="12" r="5"/>
-    <line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-    <line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-    <line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-    <line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-  </svg>
-);
-
-const MoonIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
-    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-  </svg>
-);
-
-const Navbar = ({ toggleTheme, isDarkMode }) => {
+const Navbar = () => {
+  const { user, openAuthModal, logout } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
+  const [drawerSearchTerm, setDrawerSearchTerm] = useState('');
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const navigate = useNavigate();
@@ -77,9 +60,18 @@ const Navbar = ({ toggleTheme, isDarkMode }) => {
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchTerm.trim()) {
-      navigate(`/search?q=${encodeURIComponent(searchTerm)}`);
+      navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
       setSearchTerm('');
       setShowSearch(false);
+    }
+  };
+
+  const handleDrawerSearch = (e) => {
+    e.preventDefault();
+    if (drawerSearchTerm.trim()) {
+      navigate(`/search?q=${encodeURIComponent(drawerSearchTerm.trim())}`);
+      setDrawerSearchTerm('');
+      setIsDrawerOpen(false);
     }
   };
 
@@ -98,7 +90,7 @@ const Navbar = ({ toggleTheme, isDarkMode }) => {
       {/* Main Navbar */}
       <nav className="navbar" role="navigation" aria-label="Main navigation">
 
-        {/* LEFT: Hamburger */}
+        {/* LEFT: Hamburger Toggle */}
         <button
           type="button"
           className="nav-hamburger"
@@ -109,17 +101,17 @@ const Navbar = ({ toggleTheme, isDarkMode }) => {
           <HamburgerIcon />
         </button>
 
-        {/* CENTER: Logo */}
+        {/* CENTER: Brand Logo */}
         <Link to="/" className="logo-link navbar-logo-center" aria-label="AsianDramaWiki Home">
           <img src="/logo.png" alt="AsianDramaWiki" className="nav-logo" />
         </Link>
 
         {/* RIGHT: Actions */}
         <div className="nav-actions">
-          {/* Search Icon */}
+          {/* Desktop Search Icon */}
           <button
             type="button"
-            className="nav-icon-btn"
+            className="nav-icon-btn desktop-search-btn"
             onClick={() => setShowSearch(v => !v)}
             aria-label="Search"
             id="nav-search-toggle"
@@ -127,24 +119,30 @@ const Navbar = ({ toggleTheme, isDarkMode }) => {
             <SearchIcon />
           </button>
 
-          {/* Dark/Light Pill Toggle */}
-          <button
-            type="button"
-            className={`theme-pill ${isDarkMode ? 'dark' : 'light'}`}
-            onClick={toggleTheme}
-            aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-            id="theme-toggle-pill"
-          >
-            <span className="pill-track">
-              <span className="pill-thumb">
-                {isDarkMode ? <MoonIcon /> : <SunIcon />}
-              </span>
-            </span>
-          </button>
+          {/* User Auth Profile / Login Button */}
+          {user ? (
+            <Link to="/profile" className="nav-user-pill" title={`Logged in as ${user.username}`}>
+              <img
+                src={user.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(user.username)}`}
+                alt={user.username}
+                className="nav-user-avatar"
+              />
+              <span className="nav-user-name">{user.username}</span>
+            </Link>
+          ) : (
+            <button
+              type="button"
+              className="nav-auth-btn"
+              onClick={() => openAuthModal('login')}
+              id="nav-signin-btn"
+            >
+              Sign In
+            </button>
+          )}
         </div>
       </nav>
 
-      {/* Expandable Search Bar */}
+      {/* Expandable Search Bar (Desktop) */}
       {showSearch && (
         <div className="navbar-search-bar">
           <form onSubmit={handleSearch} className="navbar-search-form">
@@ -152,7 +150,7 @@ const Navbar = ({ toggleTheme, isDarkMode }) => {
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Search dramas, actors..."
+              placeholder="Search dramas, movies, actors..."
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               className="navbar-search-input"
@@ -196,6 +194,76 @@ const Navbar = ({ toggleTheme, isDarkMode }) => {
           </button>
         </div>
 
+        {/* Embedded Drawer Search Input */}
+        <div className="drawer-search-box">
+          <form onSubmit={handleDrawerSearch} className="drawer-search-form">
+            <SearchIcon />
+            <input
+              type="text"
+              placeholder="Search dramas, movies, actors..."
+              value={drawerSearchTerm}
+              onChange={e => setDrawerSearchTerm(e.target.value)}
+              className="drawer-search-input"
+              id="drawer-search-input"
+            />
+            <button type="submit" className="drawer-search-btn">Go</button>
+          </form>
+        </div>
+
+        {/* User Account Drawer Card */}
+        <div className="drawer-account-box">
+          {user ? (
+            <div className="drawer-user-info">
+              <img
+                src={user.avatar || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(user.username)}`}
+                alt={user.username}
+                className="drawer-user-avatar"
+              />
+              <div className="drawer-user-text">
+                <span className="drawer-username">{user.username}</span>
+                <span className="drawer-email">{user.email}</span>
+              </div>
+              <button
+                type="button"
+                className="drawer-logout-btn"
+                onClick={() => {
+                  logout();
+                  setIsDrawerOpen(false);
+                }}
+                title="Sign Out"
+              >
+                Sign Out
+              </button>
+            </div>
+          ) : (
+            <div className="drawer-auth-prompt">
+              <p>Sign in to sync your drama watchlist and stats!</p>
+              <div className="drawer-auth-buttons">
+                <button
+                  type="button"
+                  className="drawer-signin-btn"
+                  onClick={() => {
+                    setIsDrawerOpen(false);
+                    openAuthModal('login');
+                  }}
+                >
+                  Sign In
+                </button>
+                <button
+                  type="button"
+                  className="drawer-signup-btn"
+                  onClick={() => {
+                    setIsDrawerOpen(false);
+                    openAuthModal('register');
+                  }}
+                >
+                  Create Account
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
         <nav className="drawer-nav">
           {navLinks.map(link => (
             <Link
@@ -210,22 +278,6 @@ const Navbar = ({ toggleTheme, isDarkMode }) => {
         </nav>
 
         <div className="drawer-footer">
-          <div className="drawer-theme-row">
-            <span className="drawer-theme-label">
-              {isDarkMode ? '🌙 Dark Mode' : '☀️ Light Mode'}
-            </span>
-            <button
-              className={`theme-pill ${isDarkMode ? 'dark' : 'light'} large`}
-              onClick={toggleTheme}
-              aria-label="Toggle theme"
-            >
-              <span className="pill-track">
-                <span className="pill-thumb">
-                  {isDarkMode ? <MoonIcon /> : <SunIcon />}
-                </span>
-              </span>
-            </button>
-          </div>
           <p className="drawer-copyright">© {new Date().getFullYear()} AsianDramaWiki</p>
         </div>
       </aside>

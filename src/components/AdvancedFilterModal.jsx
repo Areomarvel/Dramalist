@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 
 const GENRES = [
-  { id: 10759, name: 'Action & Adventure' },
-  { id: 16,    name: 'Animation / Anime' },
+  { id: 10759, name: 'Action' },
+  { id: 16,    name: 'Anime' },
   { id: 35,    name: 'Comedy' },
   { id: 18,    name: 'Drama' },
-  { id: 10765, name: 'Sci-Fi & Fantasy' },
+  { id: 10765, name: 'Sci-Fi' },
   { id: 9648,  name: 'Mystery' },
-  { id: 10768, name: 'War & Politics' },
+  { id: 10768, name: 'Politics' },
   { id: 10749, name: 'Romance' },
 ];
 
@@ -15,7 +15,7 @@ const COUNTRIES = [
   { code: 'KR', label: '🇰🇷 South Korea (K-Drama)' },
   { code: 'CN', label: '🇨🇳 China (C-Drama)' },
   { code: 'JP', label: '🇯🇵 Japan (J-Drama)' },
-  { code: 'TH', label: '🇹🇭 Thailand (Thai Drama)' },
+  { code: 'TH', label: '🇹🇭 Thailand (Thai)' },
 ];
 
 const AdvancedFilterModal = ({ isOpen, onClose, onApplyFilters, currentFilters }) => {
@@ -46,11 +46,11 @@ const AdvancedFilterModal = ({ isOpen, onClose, onApplyFilters, currentFilters }
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={onClose} role="dialog" aria-modal="true">
       <div className="filter-modal-content" onClick={e => e.stopPropagation()}>
         <div className="filter-modal-header">
-          <h3>🎛️ Advanced Search &amp; Discovery Filters</h3>
-          <button type="button" className="close-filter-btn" onClick={onClose}>✕</button>
+          <h3>🎛️ Filter Dramas</h3>
+          <button type="button" className="close-filter-btn" onClick={onClose} aria-label="Close modal">✕</button>
         </div>
 
         <div className="filter-modal-body">
@@ -71,14 +71,14 @@ const AdvancedFilterModal = ({ isOpen, onClose, onApplyFilters, currentFilters }
 
           {/* Genre Selection */}
           <div className="filter-group">
-            <label className="filter-label">Genre / Category:</label>
+            <label className="filter-label">Genre:</label>
             <div className="genre-chips-grid">
               <button
                 type="button"
                 className={`genre-chip ${selectedGenre === '' ? 'active' : ''}`}
                 onClick={() => setSelectedGenre('')}
               >
-                All Genres
+                All
               </button>
               {GENRES.map(g => (
                 <button
@@ -125,7 +125,7 @@ const AdvancedFilterModal = ({ isOpen, onClose, onApplyFilters, currentFilters }
 
         <div className="filter-modal-footer">
           <button type="button" className="filter-reset-btn" onClick={handleReset}>
-            Reset Filters
+            Reset
           </button>
           <button type="button" className="filter-apply-btn" onClick={handleApply}>
             Apply Filters

@@ -75,9 +75,11 @@ function cleanTitle(str) {
 }
 
 /**
- * Returns clean English title or null if title cannot be translated/is untranslatable non-English.
+ * Returns clean English title with proper fallbacks so items never vanish.
  */
 export function formatTitle(name, originalName) {
+  if (!name && !originalName) return 'Untitled';
+
   if (name && KNOWN_TRANSLATIONS[name.trim()]) return KNOWN_TRANSLATIONS[name.trim()];
   if (originalName && KNOWN_TRANSLATIONS[originalName.trim()]) return KNOWN_TRANSLATIONS[originalName.trim()];
 
@@ -90,24 +92,24 @@ export function formatTitle(name, originalName) {
   if (name && containsLatin(name)) return cleanTitle(name);
   if (originalName && containsLatin(originalName)) return cleanTitle(originalName);
 
-  return null;
+  // Return original name or title string as reliable fallback
+  return (name || originalName || 'Untitled').trim();
 }
 
 /**
- * Returns just the primary display name (English/Romanized), or null if invalid.
+ * Returns just the primary display name (English/Romanized), or fallback if invalid.
  */
 export function getPrimaryTitle(name, originalName) {
   return formatTitle(name, originalName);
 }
 
 /**
- * Helper function to determine if a drama/movie object has a valid English title.
- * Used for filtering out untranslatable non-English dramas.
+ * Helper function to determine if a drama/movie object has a valid title.
+ * Always returns true as long as item has name or title.
  */
 export function hasEnglishTitle(item) {
   if (!item) return false;
-  const name = item.name || item.title || '';
-  const originalName = item.original_name || item.original_title || '';
-  const result = formatTitle(name, originalName);
-  return result !== null && result.length > 0;
+  const name = item.name || item.title || item.original_name || item.original_title || '';
+  return name.trim().length > 0;
 }
+

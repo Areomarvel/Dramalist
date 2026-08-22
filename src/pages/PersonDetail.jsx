@@ -58,12 +58,11 @@ const PersonDetail = () => {
   const allCredits = person.combined_credits?.cast || [];
   const tvCredits = allCredits
     .filter(c => c.media_type === 'tv')
-    .filter(hasEnglishTitle)
     .sort((a, b) => getReleaseTime(b) - getReleaseTime(a));
   const movieCredits = allCredits
     .filter(c => c.media_type === 'movie')
-    .filter(hasEnglishTitle)
     .sort((a, b) => getReleaseTime(b) - getReleaseTime(a));
+
 
   const INITIAL_SHOW = 12;
   const displayedTV = showAllTV ? tvCredits : tvCredits.slice(0, INITIAL_SHOW);

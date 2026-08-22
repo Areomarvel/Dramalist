@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DramaCard from '../components/DramaCard';
 import HeroCarousel from '../components/HeroCarousel';
@@ -58,15 +58,15 @@ function Home() {
     setPage(1);
     setHasMore(true);
     loadDramasByCategory(category, 1, true);
-  }, [category]);
+  }, [category, loadDramasByCategory]);
 
   useEffect(() => {
     if (!carouselData[category]) loadCarouselData(category);
     if (!popularData[category]) loadPopularData(category);
     loadAiringNow(category);
-  }, [category]);
+  }, [category, carouselData, popularData, loadCarouselData, loadPopularData, loadAiringNow]);
 
-  const loadCarouselData = async (cat) => {
+  const loadCarouselData = useCallback(async (cat) => {
     const base = getQueryParams(cat);
     try {
       const [recentRes1, recentRes2, upcomingRes1, upcomingRes2] = await Promise.all([
@@ -92,9 +92,9 @@ function Home() {
     } catch (err) {
       console.error('Carousel fetch error:', err);
     }
-  };
+  }, []);
 
-  const loadPopularData = async (cat) => {
+  const loadPopularData = useCallback(async (cat) => {
     const base = getQueryParams(cat);
     try {
       const res = await fetch(`${BASE_URL}/discover/tv?api_key=${API_KEY}&${base}&sort_by=popularity.desc&page=1`);
@@ -104,9 +104,9 @@ function Home() {
     } catch (err) {
       console.error('Popular fetch error:', err);
     }
-  };
+  }, []);
 
-  const loadAiringNow = async (cat) => {
+  const loadAiringNow = useCallback(async (cat) => {
     const base = getQueryParams(cat);
     try {
       const res = await fetch(`${BASE_URL}/discover/tv?api_key=${API_KEY}&${base}&sort_by=popularity.desc&with_status=0&air_date.gte=${today}&first_air_date.lte=${today}`);
@@ -116,9 +116,9 @@ function Home() {
     } catch (err) {
       console.error('Airing now fetch error:', err);
     }
-  };
+  }, []);
 
-  const loadDramasByCategory = async (cat, pageNum = 1, reset = false) => {
+  const loadDramasByCategory = useCallback(async (cat, pageNum = 1, reset = false) => {
     if (pageNum === 1) setLoading(true);
     else setLoadingMore(true);
     setError('');
@@ -141,7 +141,7 @@ function Home() {
     }
     setLoading(false);
     setLoadingMore(false);
-  };
+  }, []);
 
   const handleLoadMore = () => {
     const nextPage = page + 1;

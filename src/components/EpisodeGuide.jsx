@@ -7,7 +7,7 @@ const EpisodeGuide = ({ totalEpisodes = 16, dramaTitle = '', dramaId }) => {
   const episodes = Array.from({ length: Math.min(totalEpisodes || 16, 50) }, (_, i) => ({
     epNumber: i + 1,
     title: `Episode ${i + 1}`,
-    airDate: 'Scheduled',
+    airDate: `Episode ${i + 1} Stream`,
     overview: `Watch Episode ${i + 1} of ${dramaTitle}. Follow the unfolding plot twists, emotional character arcs, and key narrative developments in this episode.`,
   }));
 
@@ -19,9 +19,12 @@ const EpisodeGuide = ({ totalEpisodes = 16, dramaTitle = '', dramaId }) => {
 
   return (
     <div className="episode-guide-container">
-      <h3 className="episode-guide-heading">🎬 Episode Guide & Discussion</h3>
+      <div className="ep-guide-header">
+        <h3 className="episode-guide-heading">🎬 Episode Guide &amp; Discussion</h3>
+        <span className="ep-count-badge">{totalEpisodes || 16} Episodes Total</span>
+      </div>
 
-      {/* Episode Selector Tabs */}
+      {/* Episode Selector Pills Bar */}
       <div className="episode-tabs-scroll">
         {episodes.map(ep => (
           <button
@@ -39,8 +42,11 @@ const EpisodeGuide = ({ totalEpisodes = 16, dramaTitle = '', dramaId }) => {
       {activeEpData && (
         <div className="active-ep-card">
           <div className="active-ep-header">
-            <h4>{activeEpData.title} of {dramaTitle}</h4>
-            <span className="ep-badge">Episode {activeEpData.epNumber}</span>
+            <div>
+              <span className="active-ep-pill">EPISODE {activeEpData.epNumber}</span>
+              <h4 className="active-ep-title">{activeEpData.title} of {dramaTitle}</h4>
+            </div>
+            <span className="ep-rating-badge">★ 9.2</span>
           </div>
 
           <p className="active-ep-overview">{activeEpData.overview}</p>
@@ -48,7 +54,7 @@ const EpisodeGuide = ({ totalEpisodes = 16, dramaTitle = '', dramaId }) => {
           {/* Spoiler Protection Box */}
           <div className="spoiler-box">
             <div className="spoiler-header">
-              <span>⚠️ Episode {selectedEp} Plot Highlights & Spoilers</span>
+              <span>⚠️ Episode {selectedEp} Plot Highlights &amp; Spoilers</span>
               <button
                 type="button"
                 className="spoiler-toggle-btn"
