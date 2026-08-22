@@ -53,19 +53,6 @@ function Home() {
   const [isSurpriseOpen, setIsSurpriseOpen] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState({});
 
-  // Reset page when category changes
-  useEffect(() => {
-    setPage(1);
-    setHasMore(true);
-    loadDramasByCategory(category, 1, true);
-  }, [category, loadDramasByCategory]);
-
-  useEffect(() => {
-    if (!carouselData[category]) loadCarouselData(category);
-    if (!popularData[category]) loadPopularData(category);
-    loadAiringNow(category);
-  }, [category, carouselData, popularData, loadCarouselData, loadPopularData, loadAiringNow]);
-
   const loadCarouselData = useCallback(async (cat) => {
     const base = getQueryParams(cat);
     try {
@@ -142,6 +129,19 @@ function Home() {
     setLoading(false);
     setLoadingMore(false);
   }, []);
+
+  // Reset page when category changes
+  useEffect(() => {
+    setPage(1);
+    setHasMore(true);
+    loadDramasByCategory(category, 1, true);
+  }, [category, loadDramasByCategory]);
+
+  useEffect(() => {
+    if (!carouselData[category]) loadCarouselData(category);
+    if (!popularData[category]) loadPopularData(category);
+    loadAiringNow(category);
+  }, [category, carouselData, popularData, loadCarouselData, loadPopularData, loadAiringNow]);
 
   const handleLoadMore = () => {
     const nextPage = page + 1;

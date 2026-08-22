@@ -20,6 +20,13 @@ export const AuthProvider = ({ children }) => {
     }
   });
 
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem('asiandrama_token');
+    setToken(null);
+    setUser(null);
+    // Keep local watchlist for guest browsing
+  }, []);
+
   // Verify token on initial load
   useEffect(() => {
     const initAuth = async () => {
@@ -79,13 +86,6 @@ export const AuthProvider = ({ children }) => {
       return res.user;
     }
   };
-
-  const handleLogout = useCallback(() => {
-    localStorage.removeItem('asiandrama_token');
-    setToken(null);
-    setUser(null);
-    // Keep local watchlist for guest browsing
-  }, []);
 
   const openAuthModal = (mode = 'login') => {
     setAuthModalMode(mode);
