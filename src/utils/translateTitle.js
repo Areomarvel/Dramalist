@@ -59,6 +59,11 @@ function containsLatin(str) {
   return /[a-zA-Z0-9]/.test(str);
 }
 
+function containsNonLatinScript(str) {
+  if (!str) return false;
+  return /[\u0E00-\u0E7F\u4E00-\u9FFF\u3040-\u309F\u30A0-\u30FF\uAC00-\uD7AF\u3400-\u4DBF\u0400-\u04FF\u0600-\u06FF]/.test(str);
+}
+
 // Clean string by removing non-Latin parentheticals and native script
 function cleanTitle(str) {
   if (!str) return '';
@@ -89,11 +94,13 @@ export function formatTitle(name, originalName) {
   const cleanedOriginal = cleanTitle(originalName);
   if (cleanedOriginal && containsLatin(cleanedOriginal)) return cleanedOriginal;
 
-  if (name && containsLatin(name)) return cleanTitle(name);
-  if (originalName && containsLatin(originalName)) return cleanTitle(originalName);
+  const hasLatinName = name && containsLatin(name) && !containsNonLatinScript(name);
+  if (hasLatinName) return cleanTitle(name);
 
-  // Return original name or title string as reliable fallback
-  return (name || originalName || 'Untitled').trim();
+  const hasLatinOriginal = originalName && containsLatin(originalName) && !containsNonLatinScript(originalName);
+  if (hasLatinOriginal) return cleanTitle(originalName);
+
+  return 'Untitled';
 }
 
 /**
@@ -109,7 +116,19 @@ export function getPrimaryTitle(name, originalName) {
  */
 export function hasEnglishTitle(item) {
   if (!item) return false;
-  const name = item.name || item.title || item.original_name || item.original_title || '';
-  return name.trim().length > 0;
+
+  const rawName = item.name || item.title || item.original_name || item.original_title || '';
+  const name = rawName.trim();
+
+  if (!name) return false;
+  if (KNOWN_TRANSLATIONS[name]) return true;
+
+  const cleaned = cleanTitle(name);
+  if (cleaned && containsLatin(cleaned)) return true;
+
+  const hasLatin = containsLatin(name) && !containsNonLatinScript(name);
+  if (hasLatin) return true;
+
+  return false;
 }
 

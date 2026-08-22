@@ -7,6 +7,7 @@ import DramaDetail from './pages/DramaDetail';
 import MovieDetail from './pages/MovieDetail';
 import PersonDetail from './pages/PersonDetail';
 import SearchResults from './pages/SearchResults';
+import FilteredResults from './pages/FilteredResults';
 import Upcoming from './pages/Upcoming';
 import Forum from './pages/Forum';
 import Watchlist from './pages/Watchlist';
@@ -43,6 +44,7 @@ function AppContent() {
         <Route path="/movie/:id" element={<MovieDetail />} />
         <Route path="/person/:id" element={<PersonDetail />} />
         <Route path="/search" element={<SearchResults />} />
+        <Route path="/filtered" element={<FilteredResults />} />
         <Route path="/upcoming" element={<Upcoming />} />
         <Route path="/forum" element={<Forum />} />
         <Route path="/watchlist" element={<Watchlist />} />

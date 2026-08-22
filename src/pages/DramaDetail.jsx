@@ -12,6 +12,7 @@ import ReviewSection from '../components/ReviewSection';
 import Breadcrumbs from '../components/Breadcrumbs';
 import { generatePoster } from '../utils/generatePoster';
 import { formatTitle } from '../utils/translateTitle';
+import { saveRecentlyViewed } from '../utils/personalization';
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const BASE_URL = 'https://api.themoviedb.org/3';
@@ -47,6 +48,14 @@ const DramaDetail = () => {
   useEffect(() => {
     if (drama && !drama.poster_path) {
       setGeneratedPoster(generatePoster(drama.name || drama.original_name || 'Unknown'));
+    }
+    if (drama) {
+      saveRecentlyViewed({
+        id: drama.id,
+        title: drama.name || drama.original_name || drama.title || 'Untitled',
+        poster_path: drama.poster_path || '',
+        media_type: 'tv',
+      });
     }
   }, [drama]);
 

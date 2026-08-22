@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const GENRES = [
   { id: 10759, name: 'Action' },
@@ -19,6 +20,7 @@ const COUNTRIES = [
 ];
 
 const AdvancedFilterModal = ({ isOpen, onClose, onApplyFilters, currentFilters }) => {
+  const navigate = useNavigate();
   const [selectedGenre, setSelectedGenre] = useState(currentFilters?.genre || '');
   const [selectedCountry, setSelectedCountry] = useState(currentFilters?.country || '');
   const [minRating, setMinRating] = useState(currentFilters?.minRating || 0);
@@ -27,12 +29,22 @@ const AdvancedFilterModal = ({ isOpen, onClose, onApplyFilters, currentFilters }
   if (!isOpen) return null;
 
   const handleApply = () => {
-    onApplyFilters({
+    const filters = {
       genre: selectedGenre,
       country: selectedCountry,
       minRating: Number(minRating),
       startYear,
-    });
+    };
+
+    onApplyFilters(filters);
+
+    const params = new URLSearchParams();
+    if (filters.country) params.set('country', filters.country);
+    if (filters.genre) params.set('genre', filters.genre);
+    if (filters.minRating > 0) params.set('minRating', String(filters.minRating));
+    if (filters.startYear) params.set('startYear', filters.startYear);
+
+    navigate(`/filtered${params.toString() ? `?${params.toString()}` : ''}`);
     onClose();
   };
 

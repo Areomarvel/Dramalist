@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { formatTitle } from '../utils/translateTitle';
+
+const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY || '37f536bf16346bfc6cfcefca8f004b89';
+const TMDB_SEARCH_URL = 'https://api.themoviedb.org/3/search/multi';
 
 const SearchIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
@@ -28,11 +32,25 @@ const Navbar = () => {
   const { user, openAuthModal, logout } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [drawerSearchTerm, setDrawerSearchTerm] = useState('');
+  const [searchSuggestions, setSearchSuggestions] = useState([]);
+  const [drawerSuggestions, setDrawerSuggestions] = useState([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
   const searchInputRef = useRef(null);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('asian-drama-theme');
+    const shouldUseDark = savedTheme ? savedTheme === 'dark' : true;
+    setIsDarkMode(shouldUseDark);
+  }, []);
+
+  useEffect(() => {
+    document.body.classList.toggle('light-mode', !isDarkMode);
+    localStorage.setItem('asian-drama-theme', isDarkMode ? 'dark' : 'light');
+  }, [isDarkMode]);
 
   // Close drawer on route change
   useEffect(() => {
@@ -57,11 +75,38 @@ const Navbar = () => {
     return () => { document.body.style.overflow = ''; };
   }, [isDrawerOpen]);
 
+  const buildSuggestionList = (items = []) => {
+    return items
+      .filter(item => item && (item.media_type === 'movie' || item.media_type === 'tv' || item.media_type === 'person'))
+      .slice(0, 6)
+      .map(item => {
+        const label = formatTitle(
+          item.name || item.title,
+          item.original_name || item.original_title || item.name || item.title
+        ) || item.name || item.title || 'Unknown';
+
+        const type = item.media_type === 'movie'
+          ? 'Movie'
+          : item.media_type === 'tv'
+            ? 'Drama'
+            : 'Actor';
+
+        const route = item.media_type === 'person'
+          ? `/person/${item.id}`
+          : item.media_type === 'movie'
+            ? `/movie/${item.id}`
+            : `/drama/${item.id}`;
+
+        return { id: `${item.media_type}-${item.id}`, label, type, route };
+      });
+  };
+
   const handleSearch = (e) => {
     e.preventDefault();
     if (searchTerm.trim()) {
       navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
       setSearchTerm('');
+      setSearchSuggestions([]);
       setShowSearch(false);
     }
   };
@@ -71,9 +116,78 @@ const Navbar = () => {
     if (drawerSearchTerm.trim()) {
       navigate(`/search?q=${encodeURIComponent(drawerSearchTerm.trim())}`);
       setDrawerSearchTerm('');
+      setDrawerSuggestions([]);
       setIsDrawerOpen(false);
     }
   };
+
+  const handleSuggestionSelect = (route) => {
+    navigate(route);
+    setSearchTerm('');
+    setDrawerSearchTerm('');
+    setSearchSuggestions([]);
+    setDrawerSuggestions([]);
+    setShowSearch(false);
+    setIsDrawerOpen(false);
+  };
+
+  useEffect(() => {
+    const query = searchTerm.trim();
+    if (!query) {
+      setSearchSuggestions([]);
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
+      try {
+        const response = await fetch(
+          `${TMDB_SEARCH_URL}?api_key=${TMDB_API_KEY}&language=en-US&query=${encodeURIComponent(query)}&include_adult=false`,
+          { signal: controller.signal }
+        );
+        const data = await response.json();
+        setSearchSuggestions(buildSuggestionList(data.results || []));
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          setSearchSuggestions([]);
+        }
+      }
+    }, 220);
+
+    return () => {
+      controller.abort();
+      clearTimeout(timer);
+    };
+  }, [searchTerm]);
+
+  useEffect(() => {
+    const query = drawerSearchTerm.trim();
+    if (!query) {
+      setDrawerSuggestions([]);
+      return undefined;
+    }
+
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
+      try {
+        const response = await fetch(
+          `${TMDB_SEARCH_URL}?api_key=${TMDB_API_KEY}&language=en-US&query=${encodeURIComponent(query)}&include_adult=false`,
+          { signal: controller.signal }
+        );
+        const data = await response.json();
+        setDrawerSuggestions(buildSuggestionList(data.results || []));
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          setDrawerSuggestions([]);
+        }
+      }
+    }, 220);
+
+    return () => {
+      controller.abort();
+      clearTimeout(timer);
+    };
+  }, [drawerSearchTerm]);
 
   const navLinks = [
     { to: '/', label: '🏠 Home' },
@@ -165,6 +279,21 @@ const Navbar = () => {
             >
               <CloseIcon />
             </button>
+            {searchSuggestions.length > 0 && (
+              <div className="search-suggestions-panel">
+                {searchSuggestions.map(item => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className="search-suggestion-item"
+                    onClick={() => handleSuggestionSelect(item.route)}
+                  >
+                    <span className="search-suggestion-label">{item.label}</span>
+                    <span className="search-suggestion-type">{item.type}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </form>
         </div>
       )}
@@ -207,6 +336,21 @@ const Navbar = () => {
               id="drawer-search-input"
             />
             <button type="submit" className="drawer-search-btn">Go</button>
+            {drawerSuggestions.length > 0 && (
+              <div className="search-suggestions-panel drawer-suggestions-panel">
+                {drawerSuggestions.map(item => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    className="search-suggestion-item"
+                    onClick={() => handleSuggestionSelect(item.route)}
+                  >
+                    <span className="search-suggestion-label">{item.label}</span>
+                    <span className="search-suggestion-type">{item.type}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </form>
         </div>
 
@@ -278,6 +422,20 @@ const Navbar = () => {
         </nav>
 
         <div className="drawer-footer">
+          <div className="drawer-theme-row">
+            <span className="drawer-theme-label">Theme</span>
+            <button
+              type="button"
+              className={`theme-pill large ${!isDarkMode ? 'light' : ''}`}
+              onClick={() => setIsDarkMode(prev => !prev)}
+              aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              <span className="pill-track">
+                <span className="pill-thumb">{isDarkMode ? '🌙' : '☀️'}</span>
+              </span>
+            </button>
+          </div>
           <p className="drawer-copyright">© {new Date().getFullYear()} AsianDramaWiki</p>
         </div>
       </aside>

@@ -5,8 +5,12 @@ import HeroCarousel from '../components/HeroCarousel';
 import PopularCarousel from '../components/PopularCarousel';
 import AdvancedFilterModal from '../components/AdvancedFilterModal';
 import SurpriseMeModal from '../components/SurpriseMeModal';
+import PersonalizedSection from '../components/PersonalizedSection';
+import DiscoveryPills from '../components/DiscoveryPills';
 import { hasEnglishTitle, formatTitle } from '../utils/translateTitle';
 import { generatePoster } from '../utils/generatePoster';
+import { getRecentSearches, saveRecentSearch, getContinueWatching, getRecommendedFromHistory, getRecentlyViewed } from '../utils/personalization';
+import { useAuth } from '../context/AuthContext';
 import '../App.css';
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
@@ -24,20 +28,49 @@ const CATEGORIES = [
 
 const today = new Date().toISOString().split('T')[0];
 
-function getQueryParams(cat) {
+function getQueryParams(cat, filters = {}) {
+  const params = new URLSearchParams();
+
   switch (cat) {
-    case 'KR': return 'with_origin_country=KR';
-    case 'CN': return 'with_origin_country=CN';
-    case 'JP': return 'with_origin_country=JP';
-    case 'TH': return 'with_origin_country=TH';
-    case 'ANIME': return 'with_origin_country=JP&with_genres=16';
-    case 'CARTOON': return 'with_genres=16&without_origin_country=JP|KR|CN|TH';
-    default: return 'with_origin_country=KR';
+    case 'KR': params.set('with_origin_country', 'KR'); break;
+    case 'CN': params.set('with_origin_country', 'CN'); break;
+    case 'JP': params.set('with_origin_country', 'JP'); break;
+    case 'TH': params.set('with_origin_country', 'TH'); break;
+    case 'ANIME':
+      params.set('with_origin_country', 'JP');
+      params.set('with_genres', '16');
+      break;
+    case 'CARTOON':
+      params.set('with_genres', '16');
+      params.set('without_origin_country', 'JP|KR|CN|TH');
+      break;
+    default:
+      params.set('with_origin_country', 'KR');
+      break;
   }
+
+  if (filters.country) {
+    params.set('with_origin_country', filters.country);
+  }
+
+  if (filters.genre) {
+    params.set('with_genres', filters.genre);
+  }
+
+  if (filters.minRating > 0) {
+    params.set('vote_average.gte', String(filters.minRating));
+  }
+
+  if (filters.startYear) {
+    params.set('first_air_date.gte', `${filters.startYear}-01-01`);
+  }
+
+  return params.toString();
 }
 
 function Home() {
   const navigate = useNavigate();
+  const { watchlist } = useAuth();
   const [dramas, setDramas] = useState([]);
   const [category, setCategory] = useState('KR');
   const [loading, setLoading] = useState(false);
@@ -52,9 +85,13 @@ function Home() {
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
   const [isSurpriseOpen, setIsSurpriseOpen] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState({});
+  const [recentSearches, setRecentSearches] = useState(getRecentSearches());
+  const [rememberedItems, setRememberedItems] = useState(getRecentlyViewed());
+  const [continueWatching, setContinueWatching] = useState(getContinueWatching());
+  const [discoveryMood, setDiscoveryMood] = useState('All');
 
-  const loadCarouselData = useCallback(async (cat) => {
-    const base = getQueryParams(cat);
+  const loadCarouselData = useCallback(async (cat, filters = {}) => {
+    const base = getQueryParams(cat, filters);
     try {
       const [recentRes1, recentRes2, upcomingRes1, upcomingRes2] = await Promise.all([
         fetch(`${BASE_URL}/discover/tv?api_key=${API_KEY}&${base}&sort_by=first_air_date.desc&first_air_date.lte=${today}&page=1`),
@@ -81,8 +118,8 @@ function Home() {
     }
   }, []);
 
-  const loadPopularData = useCallback(async (cat) => {
-    const base = getQueryParams(cat);
+  const loadPopularData = useCallback(async (cat, filters = {}) => {
+    const base = getQueryParams(cat, filters);
     try {
       const res = await fetch(`${BASE_URL}/discover/tv?api_key=${API_KEY}&${base}&sort_by=popularity.desc&page=1`);
       const data = await res.json();
@@ -93,8 +130,8 @@ function Home() {
     }
   }, []);
 
-  const loadAiringNow = useCallback(async (cat) => {
-    const base = getQueryParams(cat);
+  const loadAiringNow = useCallback(async (cat, filters = {}) => {
+    const base = getQueryParams(cat, filters);
     try {
       const res = await fetch(`${BASE_URL}/discover/tv?api_key=${API_KEY}&${base}&sort_by=popularity.desc&with_status=0&air_date.gte=${today}&first_air_date.lte=${today}`);
       const data = await res.json();
@@ -105,11 +142,17 @@ function Home() {
     }
   }, []);
 
-  const loadDramasByCategory = useCallback(async (cat, pageNum = 1, reset = false) => {
+  useEffect(() => {
+    setRecentSearches(getRecentSearches());
+    setRememberedItems(getRecentlyViewed());
+    setContinueWatching(getContinueWatching());
+  }, [category]);
+
+  const loadDramasByCategory = useCallback(async (cat, pageNum = 1, reset = false, filters = {}) => {
     if (pageNum === 1) setLoading(true);
     else setLoadingMore(true);
     setError('');
-    const base = getQueryParams(cat);
+    const base = getQueryParams(cat, filters);
     try {
       const response = await fetch(`${BASE_URL}/discover/tv?api_key=${API_KEY}&${base}&sort_by=first_air_date.desc&first_air_date.lte=${today}&page=${pageNum}`);
       const data = await response.json();
@@ -130,28 +173,36 @@ function Home() {
     setLoadingMore(false);
   }, []);
 
-  // Reset page when category changes
+  // Reset page when category or filters change
   useEffect(() => {
     setPage(1);
     setHasMore(true);
-    loadDramasByCategory(category, 1, true);
-  }, [category, loadDramasByCategory]);
+    loadDramasByCategory(category, 1, true, appliedFilters);
+  }, [category, appliedFilters, loadDramasByCategory]);
 
   useEffect(() => {
-    if (!carouselData[category]) loadCarouselData(category);
-    if (!popularData[category]) loadPopularData(category);
-    loadAiringNow(category);
-  }, [category, carouselData, popularData, loadCarouselData, loadPopularData, loadAiringNow]);
+    loadCarouselData(category, appliedFilters);
+    loadPopularData(category, appliedFilters);
+    loadAiringNow(category, appliedFilters);
+  }, [category, appliedFilters, loadCarouselData, loadPopularData, loadAiringNow]);
 
   const handleLoadMore = () => {
     const nextPage = page + 1;
     setPage(nextPage);
-    loadDramasByCategory(category, nextPage, false);
+    loadDramasByCategory(category, nextPage, false, appliedFilters);
   };
 
   const currentCategory = CATEGORIES.find(c => c.key === category);
   const carouselInfo = carouselData[category] || { recent: [], upcoming: [] };
   const popularList = popularData[category] || [];
+  const personalizedRecommendations = getRecommendedFromHistory(popularList, watchlist, continueWatching);
+
+  const filteredMoodRecs = personalizedRecommendations;
+
+  const handleSearchShortcut = (term) => {
+    saveRecentSearch(term);
+    navigate(`/search?q=${encodeURIComponent(term)}`);
+  };
 
   return (
     <div className="app-container">
@@ -202,12 +253,47 @@ function Home() {
         dramas={dramas}
       />
 
+      <div className="home-stack-top">
+        {recentSearches.length > 0 && (
+          <div className="personalized-section">
+            <div className="section-header compact-header">
+              <h2 className="section-title">Recent Searches</h2>
+            </div>
+            <div className="search-chip-row">
+              {recentSearches.map(search => (
+                <button key={search} type="button" className="search-chip" onClick={() => handleSearchShortcut(search)}>{search}</button>
+              ))}
+            </div>
+          </div>
+        )}
+
+      </div>
+
       {/* Hero Carousel: Recent + Upcoming */}
       {(carouselInfo.recent.length > 0 || carouselInfo.upcoming.length > 0) && (
         <HeroCarousel
           recentItems={carouselInfo.recent}
           upcomingItems={carouselInfo.upcoming}
         />
+      )}
+
+      {continueWatching.length > 0 && (
+        <PersonalizedSection title="Continue Watching" items={continueWatching.map(item => ({
+          id: item.id,
+          title: item.title || item.dramaTitle || 'Untitled',
+          name: item.title || item.dramaTitle || 'Untitled',
+          poster_path: item.poster_path || '',
+          media_type: 'tv',
+          vote_average: item.vote_average || 0,
+        }))} emptyMessage="Keep watching your favorites here." compact />
+      )}
+
+      {rememberedItems.length > 0 && (
+        <PersonalizedSection title="Recently Viewed" items={rememberedItems} emptyMessage="Your recent picks will appear here." compact />
+      )}
+
+      {filteredMoodRecs.length > 0 && (
+        <PersonalizedSection title="For You" items={filteredMoodRecs} emptyMessage="No personalized picks yet." compact />
       )}
 
       {/* Popular Carousel */}
