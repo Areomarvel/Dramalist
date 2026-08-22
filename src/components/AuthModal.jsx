@@ -8,6 +8,7 @@ const AuthModal = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -17,6 +18,7 @@ const AuthModal = () => {
     setUsername('');
     setEmail('');
     setPassword('');
+    setShowPassword(false);
   }, [authModalMode, isAuthModalOpen]);
 
   if (!isAuthModalOpen) return null;
@@ -51,12 +53,18 @@ const AuthModal = () => {
 
         <div className="auth-modal-header">
           <div className="auth-logo-badge">📺</div>
-          <h3>{mode === 'register' ? 'Create Your Account' : 'Welcome Back'}</h3>
+          <h3>{mode === 'register' ? 'Create your account' : 'Welcome back'}</h3>
           <p>
             {mode === 'register'
-              ? 'Join AsianDramaWiki to save your watchlist across devices, track episodes, and review dramas!'
-              : 'Sign in to access your personal drama watchlist and custom stats.'}
+              ? 'Save your watchlist, keep track of episodes, and join the Asian drama conversation.'
+              : 'Sign in to continue tracking dramas, favorites, and your personal stats.'}
           </p>
+        </div>
+
+        <div className="auth-trust-row">
+          <span className="auth-trust-item">📌 Watchlist</span>
+          <span className="auth-trust-item">🎯 Personal stats</span>
+          <span className="auth-trust-item">💬 Community</span>
         </div>
 
         {/* Auth Mode Tabs */}
@@ -126,13 +134,24 @@ const AuthModal = () => {
               <span className="input-icon">🔒</span>
               <input
                 id="auth-password"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 placeholder={mode === 'register' ? 'At least 6 characters' : 'Enter your password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? '🙈' : '👁️'}
+              </button>
             </div>
+            {mode === 'register' && (
+              <small className="auth-input-hint">Use 6 or more characters for a stronger password.</small>
+            )}
           </div>
 
           <button
@@ -141,9 +160,13 @@ const AuthModal = () => {
             disabled={loading}
             id="auth-submit-btn"
           >
-            {loading ? 'Please wait…' : mode === 'register' ? 'Create Account' : 'Sign In'}
+            {loading ? 'Please wait…' : mode === 'register' ? 'Create my account' : 'Sign in'}
           </button>
         </form>
+
+        <p className="auth-form-note">
+          By continuing, you agree to keep your account secure and stay up to date with your drama activity.
+        </p>
 
         <div className="auth-modal-footer">
           {mode === 'login' ? (
