@@ -9,7 +9,7 @@ import PersonalizedSection from '../components/PersonalizedSection';
 import DiscoveryPills from '../components/DiscoveryPills';
 import { hasEnglishTitle, formatTitle } from '../utils/translateTitle';
 import { generatePoster } from '../utils/generatePoster';
-import { getRecentSearches, saveRecentSearch, getContinueWatching, getRecommendedFromHistory, getRecentlyViewed } from '../utils/personalization';
+import { getRecentSearches, saveRecentSearch, getContinueWatching, getRecommendedFromHistory, getRecentlyViewed, getRandomRecommendations } from '../utils/personalization';
 import { useAuth } from '../context/AuthContext';
 import '../App.css';
 
@@ -195,7 +195,38 @@ function Home() {
   const currentCategory = CATEGORIES.find(c => c.key === category);
   const carouselInfo = carouselData[category] || { recent: [], upcoming: [] };
   const popularList = popularData[category] || [];
-  const personalizedRecommendations = getRecommendedFromHistory(popularList, watchlist, continueWatching);
+  const [personalizedRecommendations, setPersonalizedRecommendations] = useState([]);
+
+  const loadRandomForYou = useCallback(async (cat, desired = 8) => {
+    const base = getQueryParams(cat, appliedFilters);
+    try {
+      const collected = [];
+      // Fetch first 3 pages for a broader pool (keeps requests reasonable)
+      const pagesToFetch = [1, 2, 3];
+      const fetches = pagesToFetch.map(p => fetch(`${BASE_URL}/discover/tv?api_key=${API_KEY}&${base}&sort_by=popularity.desc&page=${p}`));
+      const responses = await Promise.all(fetches);
+      const jsons = await Promise.all(responses.map(r => r.json()));
+      jsons.forEach(js => {
+        (js.results || []).forEach(item => {
+          if (hasEnglishTitle(item.name || item.title || item.original_name || item.original_title)) collected.push(item);
+        });
+      });
+
+      // Remove duplicates by id
+      const unique = Array.from(new Map(collected.map(i => [i.id, i])).values());
+      const picks = getRandomRecommendations(unique, desired);
+      setPersonalizedRecommendations(picks);
+    } catch (e) {
+      console.error('For You fetch error:', e);
+      // Fallback to popularList if API sampling fails
+      setPersonalizedRecommendations(getRandomRecommendations(popularList || [], 8));
+    }
+  }, [appliedFilters, popularList]);
+
+  useEffect(() => {
+    // Randomize For You on load and whenever category or filters change
+    loadRandomForYou(category, 8);
+  }, [category, appliedFilters, loadRandomForYou]);
 
   const filteredMoodRecs = personalizedRecommendations;
 

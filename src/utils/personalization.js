@@ -89,3 +89,22 @@ export function getRecommendedFromHistory(popularItems = [], watchlist = [], pro
 
   return results.slice(0, 8);
 }
+
+export function shuffleArray(arr) {
+  try {
+    const copy = Array.isArray(arr) ? [...arr] : [];
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  } catch {
+    return arr || [];
+  }
+}
+
+export function getRandomRecommendations(items = [], count = 8) {
+  if (!Array.isArray(items) || items.length === 0) return [];
+  const shuffled = shuffleArray(items);
+  return shuffled.slice(0, Math.min(count, shuffled.length));
+}
