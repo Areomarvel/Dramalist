@@ -61,6 +61,7 @@ body {
   color: var(--text);
   min-height: 100vh;
   line-height: 1.6;
+  padding-top: var(--navbar-h);
   transition: background-color 0.3s, color 0.3s;
   -webkit-font-smoothing: antialiased;
 }
@@ -176,8 +177,10 @@ button { font-family: inherit; cursor: pointer; }
    5. Navbar
    ---------------------------------------------------------------- */
 .navbar {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 500;
   height: var(--navbar-h);
   display: flex;
