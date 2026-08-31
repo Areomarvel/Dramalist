@@ -1,5 +1,6 @@
-const PRIMARY_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:2150';
-const FALLBACK_BASE_URL = 'http://127.0.0.1:2150';
+const RENDER_BACKEND_URL = 'https://database-dramalist-1.onrender.com';
+const PRIMARY_BASE_URL = import.meta.env.VITE_API_URL || RENDER_BACKEND_URL;
+const FALLBACK_BASE_URL = PRIMARY_BASE_URL === 'http://localhost:2150' ? 'http://127.0.0.1:2150' : RENDER_BACKEND_URL;
 
 export async function apiFetch(endpoint, options = {}) {
   const token = localStorage.getItem('asiandrama_token');
@@ -16,13 +17,13 @@ export async function apiFetch(endpoint, options = {}) {
   let response;
 
   try {
-    // Attempt 1: Try configured URL (or http://localhost:2150)
+    // Attempt 1: Try primary URL
     response = await fetch(`${PRIMARY_BASE_URL}${endpoint}`, {
       ...options,
       headers
     });
   } catch (primaryErr) {
-    // Attempt 2: Fallback to http://127.0.0.1:2150 if localhost IPv6 resolution failed
+    // Attempt 2: Fallback attempt
     try {
       if (PRIMARY_BASE_URL !== FALLBACK_BASE_URL) {
         response = await fetch(`${FALLBACK_BASE_URL}${endpoint}`, {
@@ -35,7 +36,7 @@ export async function apiFetch(endpoint, options = {}) {
     } catch (fallbackErr) {
       console.error('API Network Error:', fallbackErr);
       throw new Error(
-        'Unable to connect to backend server. Please make sure your backend (node index.js in Database folder) is started on port 2150.'
+        `Unable to connect to backend server at ${PRIMARY_BASE_URL}. If deployed, please wait a moment for the server to wake up or check your environment variables.`
       );
     }
   }
