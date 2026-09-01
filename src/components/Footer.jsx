@@ -6,7 +6,7 @@ const Footer = () => {
       <div className="footer-container">
         <div className="footer-brand-col">
           <Link to="/" className="footer-logo-link">
-            <img src="/logo.png" alt="DramaInfo" className="footer-logo" />
+            <img src="/logo.svg" alt="DramaInfo" className="footer-logo" />
             <span className="footer-site-name">DramaInfo</span>
           </Link>
           <p className="footer-tagline">

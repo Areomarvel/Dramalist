@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { formatTitle } from '../utils/translateTitle';
 
 const TMDB_API_KEY = import.meta.env.VITE_TMDB_API_KEY || '37f536bf16346bfc6cfcefca8f004b89';
@@ -30,27 +31,16 @@ const HamburgerIcon = () => (
 
 const Navbar = () => {
   const { user, openAuthModal, logout } = useAuth();
+  const { theme } = useTheme();
   const [searchTerm, setSearchTerm] = useState('');
   const [drawerSearchTerm, setDrawerSearchTerm] = useState('');
   const [searchSuggestions, setSearchSuggestions] = useState([]);
   const [drawerSuggestions, setDrawerSuggestions] = useState([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
   const searchInputRef = useRef(null);
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('asian-drama-theme');
-    const shouldUseDark = savedTheme ? savedTheme === 'dark' : true;
-    setIsDarkMode(shouldUseDark);
-  }, []);
-
-  useEffect(() => {
-    document.body.classList.toggle('light-mode', !isDarkMode);
-    localStorage.setItem('asian-drama-theme', isDarkMode ? 'dark' : 'light');
-  }, [isDarkMode]);
 
   // Close drawer on route change
   useEffect(() => {
@@ -217,7 +207,7 @@ const Navbar = () => {
 
         {/* CENTER: Brand Logo */}
         <Link to="/" className="logo-link navbar-logo-center" aria-label="DramaInfo Home">
-          <img src="/logo.png" alt="DramaInfo" className="nav-logo" />
+          <img src="/logo.svg" alt="DramaInfo" className="nav-logo" />
         </Link>
 
         {/* RIGHT: Actions */}
@@ -309,7 +299,7 @@ const Navbar = () => {
       <aside className={`side-drawer ${isDrawerOpen ? 'open' : ''}`} aria-label="Site menu">
         <div className="drawer-header">
           <Link to="/" className="drawer-logo-link" onClick={() => setIsDrawerOpen(false)}>
-            <img src="/logo.png" alt="DramaInfo" className="drawer-logo" />
+            <img src="/logo.svg" alt="DramaInfo" className="drawer-logo" />
             <span className="drawer-site-name">DramaInfo</span>
           </Link>
           <button
@@ -422,20 +412,9 @@ const Navbar = () => {
         </nav>
 
         <div className="drawer-footer">
-          <div className="drawer-theme-row">
-            <span className="drawer-theme-label">Theme</span>
-            <button
-              type="button"
-              className={`theme-pill large ${!isDarkMode ? 'light' : ''}`}
-              onClick={() => setIsDarkMode(prev => !prev)}
-              aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-              title={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-            >
-              <span className="pill-track">
-                <span className="pill-thumb">{isDarkMode ? '🌙' : '☀️'}</span>
-              </span>
-            </button>
-          </div>
+          <Link to="/profile" className="drawer-theme-link" onClick={() => setIsDrawerOpen(false)}>
+            🎨 Change Theme
+          </Link>
           <p className="drawer-copyright">© {new Date().getFullYear()} DramaInfo</p>
         </div>
       </aside>

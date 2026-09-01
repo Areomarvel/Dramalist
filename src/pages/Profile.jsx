@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme, THEMES } from '../context/ThemeContext';
 
 const Profile = () => {
   const { user, logout, openAuthModal, watchlist, updateProfile: saveUserProfile } = useAuth();
+  const { theme, setTheme } = useTheme();
 
   const [isEditing, setIsEditing] = useState(false);
   const [username, setUsername] = useState(user?.username || '');
@@ -133,6 +135,42 @@ const Profile = () => {
         </form>
       )}
 
+      {/* ── Theme Customizer ─────────────────────────────────── */}
+      <h2 className="section-title" style={{ marginTop: '36px' }}>🎨 Appearance & Theme</h2>
+      <div className="theme-picker-card">
+        <p className="theme-picker-desc">
+          Choose a color theme that suits your style. Your preference is saved automatically.
+        </p>
+        <div className="theme-grid">
+          {THEMES.map(t => (
+            <button
+              key={t.id}
+              id={`theme-btn-${t.id}`}
+              type="button"
+              className={`theme-option-btn${theme === t.id ? ' theme-option-active' : ''}`}
+              onClick={() => setTheme(t.id)}
+              title={t.description}
+            >
+              {/* Mini preview swatch */}
+              <div className="theme-swatch-row">
+                <span className="theme-swatch" style={{ background: t.preview.bg }} />
+                <span className="theme-swatch" style={{ background: t.preview.card }} />
+                <span
+                  className="theme-swatch theme-swatch-accent"
+                  style={{ background: t.preview.accent }}
+                />
+                <span
+                  className="theme-swatch theme-swatch-accent2"
+                  style={{ background: t.preview.accent2 }}
+                />
+              </div>
+              <span className="theme-option-name">{t.name}</span>
+              {theme === t.id && <span className="theme-active-tick">✓ Active</span>}
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Stats Dashboard Cards */}
       <h2 className="section-title" style={{ marginTop: '36px' }}>📊 Watching Statistics</h2>
       <div className="stats-grid">
@@ -188,4 +226,3 @@ const Profile = () => {
 };
 
 export default Profile;
-

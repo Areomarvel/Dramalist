@@ -6,23 +6,25 @@
 /* ----------------------------------------------------------------
    1. CSS Variables & Theming
    ---------------------------------------------------------------- */
-:root {
-  /* Dark Mode (Default) */
-  --bg:         #0d1117;
-  --bg-alt:     #161b22;
-  --card-bg:    #1c2333;
-  --card-hover: #212d3f;
-  --border:     rgba(255,255,255,0.08);
-  --accent:     #58a6ff;
-  --accent-glow:rgba(88,166,255,0.25);
-  --accent2:    #f78166;
-  --text:       #e6edf3;
-  --text-muted: #8b949e;
-  --text-dim:   #6e7681;
-  --star-fill:  #f0c040;
-  --shadow-sm:  0 2px 8px rgba(0,0,0,0.4);
-  --shadow-md:  0 8px 24px rgba(0,0,0,0.5);
-  --shadow-lg:  0 16px 48px rgba(0,0,0,0.6);
+:root,
+[data-theme="midnight-blue"],
+[data-theme="black-white"] {
+  /* Default Theme: Midnight Blue inspired by DramaInfo */
+  --bg:         #081426;
+  --bg-alt:     #0d1b2a;
+  --card-bg:    #12243d;
+  --card-hover: #1a2f4f;
+  --border:     rgba(125, 176, 255, 0.18);
+  --accent:     #5fb6f8;
+  --accent-glow:rgba(95, 182, 248, 0.28);
+  --accent2:    #9cc6ff;
+  --text:       #edf5ff;
+  --text-muted: #a9bdd9;
+  --text-dim:   #6b7f9d;
+  --star-fill:  #f4c96a;
+  --shadow-sm:  0 2px 8px rgba(2,12,26,0.5);
+  --shadow-md:  0 10px 24px rgba(2,12,26,0.68);
+  --shadow-lg:  0 18px 50px rgba(2,12,26,0.8);
   --navbar-h:   64px;
   --radius-sm:  8px;
   --radius-md:  12px;
@@ -30,22 +32,118 @@
   --transition: 0.2s ease;
 }
 
-body.light-mode {
-  --bg:         #f0f4f8;
-  --bg-alt:     #e2e8f0;
+[data-theme="cherry-blossom"] {
+  /* Cherry Blossom & Rose Gold */
+  --bg:         #130e18;
+  --bg-alt:     #1c1524;
+  --card-bg:    #251b30;
+  --card-hover: #2f223d;
+  --border:     rgba(255,255,255,0.09);
+  --accent:     #f43f5e;
+  --accent-glow:rgba(244,63,94,0.28);
+  --accent2:    #fb923c;
+  --text:       #fcf0f5;
+  --text-muted: #a899b0;
+  --text-dim:   #7b6b85;
+  --star-fill:  #fbbf24;
+  --shadow-sm:  0 2px 8px rgba(0,0,0,0.45);
+  --shadow-md:  0 8px 24px rgba(0,0,0,0.55);
+  --shadow-lg:  0 16px 48px rgba(0,0,0,0.65);
+}
+
+[data-theme="sapphire-gold"] {
+  /* Midnight Sapphire & Gold */
+  --bg:         #0a0f1d;
+  --bg-alt:     #111827;
+  --card-bg:    #131c31;
+  --card-hover: #1f2a44;
+  --border:     rgba(56,189,248,0.15);
+  --accent:     #38bdf8;
+  --accent-glow:rgba(56,189,248,0.25);
+  --accent2:    #fbbf24;
+  --text:       #f0f9ff;
+  --text-muted: #94a3b8;
+  --text-dim:   #64748b;
+  --star-fill:  #fbbf24;
+  --shadow-sm:  0 2px 8px rgba(0,0,0,0.5);
+  --shadow-md:  0 8px 24px rgba(0,0,0,0.6);
+  --shadow-lg:  0 16px 48px rgba(0,0,0,0.7);
+}
+
+[data-theme="amethyst-violet"] {
+  /* Royal Amethyst & Magenta */
+  --bg:         #0d0b18;
+  --bg-alt:     #141026;
+  --card-bg:    #19142b;
+  --card-hover: #261f40;
+  --border:     rgba(139,92,246,0.18);
+  --accent:     #8b5cf6;
+  --accent-glow:rgba(139,92,246,0.28);
+  --accent2:    #ec4899;
+  --text:       #f5f3ff;
+  --text-muted: #a78bfa;
+  --text-dim:   #7c3aed;
+  --star-fill:  #fbbf24;
+  --shadow-sm:  0 2px 8px rgba(0,0,0,0.5);
+  --shadow-md:  0 8px 24px rgba(0,0,0,0.6);
+  --shadow-lg:  0 16px 48px rgba(0,0,0,0.7);
+}
+
+[data-theme="emerald-jade"] {
+  /* Emerald Jade & Mint */
+  --bg:         #09130e;
+  --bg-alt:     #0d1d16;
+  --card-bg:    #11241b;
+  --card-hover: #1b382a;
+  --border:     rgba(16,185,129,0.18);
+  --accent:     #10b981;
+  --accent-glow:rgba(16,185,129,0.28);
+  --accent2:    #f59e0b;
+  --text:       #ecfdf5;
+  --text-muted: #6ee7b7;
+  --text-dim:   #047857;
+  --star-fill:  #f59e0b;
+  --shadow-sm:  0 2px 8px rgba(0,0,0,0.5);
+  --shadow-md:  0 8px 24px rgba(0,0,0,0.6);
+  --shadow-lg:  0 16px 48px rgba(0,0,0,0.7);
+}
+
+[data-theme="sunset-amber"] {
+  /* Sunset Amber & Crimson */
+  --bg:         #160b0b;
+  --bg-alt:     #201010;
+  --card-bg:    #271212;
+  --card-hover: #3a1b1b;
+  --border:     rgba(249,115,22,0.18);
+  --accent:     #f97316;
+  --accent-glow:rgba(249,115,22,0.28);
+  --accent2:    #ef4444;
+  --text:       #fff7ed;
+  --text-muted: #fdba74;
+  --text-dim:   #ea580c;
+  --star-fill:  #fbbf24;
+  --shadow-sm:  0 2px 8px rgba(0,0,0,0.5);
+  --shadow-md:  0 8px 24px rgba(0,0,0,0.6);
+  --shadow-lg:  0 16px 48px rgba(0,0,0,0.7);
+}
+
+[data-theme="light-monochrome"] {
+  /* Minimalist Light Mode */
+  --bg:         #ffffff;
+  --bg-alt:     #f8fafc;
   --card-bg:    #ffffff;
-  --card-hover: #f7f9fc;
-  --border:     rgba(0,0,0,0.1);
-  --accent:     #0969da;
-  --accent-glow:rgba(9,105,218,0.2);
-  --accent2:    #cf222e;
-  --text:       #1f2328;
-  --text-muted: #57606a;
-  --text-dim:   #6e7781;
-  --star-fill:  #d4a017;
-  --shadow-sm:  0 2px 8px rgba(0,0,0,0.08);
-  --shadow-md:  0 8px 24px rgba(0,0,0,0.1);
-  --shadow-lg:  0 16px 48px rgba(0,0,0,0.12);
+  --card-hover: #f1f5f9;
+  --border:     rgba(15,23,42,0.12);
+  --accent:     #0f172a;
+  --accent-glow:rgba(15,23,42,0.15);
+  --accent2:    #475569;
+  --text:       #0f172a;
+  --text-muted: #475569;
+  --text-dim:   #64748b;
+  --star-fill:  #f59e0b;
+  --shadow-sm:  0 2px 8px rgba(15,23,42,0.06);
+  --shadow-md:  0 8px 24px rgba(15,23,42,0.1);
+  --shadow-lg:  0 16px 48px rgba(15,23,42,0.14);
 }
 
 /* ----------------------------------------------------------------
@@ -53,7 +151,7 @@ body.light-mode {
    ---------------------------------------------------------------- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; background-color: var(--bg); }
 
 body {
   font-family: 'Inter', 'Segoe UI', sans-serif;
@@ -132,11 +230,12 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 .loading-logo {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
   object-fit: cover;
   animation: pulse-logo 1s ease-in-out infinite alternate;
+  background: rgba(26, 43, 60, 0.35);
 }
 
 .loading-text {
@@ -214,11 +313,12 @@ button { font-family: inherit; cursor: pointer; }
   transform: translateX(-50%);
 }
 .navbar-logo-center .nav-logo {
-  height: 44px;
-  width: 44px;
-  border-radius: 50%;
+  height: 48px;
+  width: 48px;
+  border-radius: 18px;
   object-fit: cover;
   transition: transform var(--transition);
+  box-shadow: 0 10px 28px rgba(31, 54, 76, 0.25);
 }
 .navbar-logo-center:hover .nav-logo { transform: scale(1.08); }
 
@@ -490,9 +590,9 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 .drawer-logo {
-  height: 40px;
-  width: 40px;
-  border-radius: 50%;
+  height: 42px;
+  width: 42px;
+  border-radius: 16px;
   object-fit: cover;
 }
 
@@ -608,16 +708,16 @@ button { font-family: inherit; cursor: pointer; }
 }
 .filter-btn:hover {
   transform: translateY(-1px);
-  border-color: rgba(88,166,255,0.7);
+  border-color: var(--accent);
   color: var(--accent);
-  background: rgba(88,166,255,0.08);
-  box-shadow: 0 6px 18px rgba(88,166,255,0.12);
+  background: var(--accent-glow);
+  box-shadow: 0 6px 18px var(--accent-glow);
 }
 .filter-btn.active {
-  background: linear-gradient(135deg, var(--accent), #7c6cff);
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
   color: #fff;
   border-color: transparent;
-  box-shadow: 0 10px 22px rgba(88,166,255,0.24);
+  box-shadow: 0 10px 22px var(--accent-glow);
 }
 
 .home-stack-top {
@@ -831,7 +931,7 @@ button { font-family: inherit; cursor: pointer; }
   margin-bottom: 14px;
   width: fit-content;
 }
-.badge-recent  { background: rgba(88,166,255,0.25); color: #58a6ff; border: 1px solid rgba(88,166,255,0.4); }
+.badge-recent  { background: var(--accent-glow); color: var(--accent); border: 1px solid var(--accent); }
 .badge-upcoming{ background: rgba(240,192,64,0.2);  color: #f0c040; border: 1px solid rgba(240,192,64,0.4); }
 
 .hero-title {
@@ -2798,9 +2898,9 @@ button { font-family: inherit; cursor: pointer; }
 }
 
 .footer-logo {
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
+  width: 46px;
+  height: 46px;
+  border-radius: 16px;
   object-fit: cover;
 }
 
@@ -5445,4 +5545,85 @@ button { font-family: inherit; cursor: pointer; }
 
 
 
-
+/* ================================================================
+   Theme Picker (Profile Page)
+   ================================================================ */
+.theme-picker-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 12px;
+}
+.theme-picker-desc {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 12px;
+}
+.theme-option-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--bg-alt);
+  border: 2px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+  text-align: left;
+  position: relative;
+}
+.theme-option-btn:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--accent-glow);
+}
+.theme-option-active {
+  border-color: var(--accent) !important;
+  background: var(--card-hover);
+  box-shadow: 0 0 0 3px var(--accent-glow), 0 6px 20px var(--accent-glow);
+}
+.theme-swatch-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.theme-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.15);
+  display: inline-block;
+  flex-shrink: 0;
+}
+.theme-swatch-accent {
+  width: 28px;
+  height: 28px;
+}
+.theme-swatch-accent2 {
+  width: 18px;
+  height: 18px;
+}
+.theme-option-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.3;
+}
+.theme-active-tick {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-glow);
+  border: 1px solid var(--accent);
+  border-radius: 20px;
+  padding: 2px 10px;
+  margin-top: 2px;
+  letter-spacing: 0.04em;
+}

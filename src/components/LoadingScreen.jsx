@@ -25,7 +25,7 @@ const LoadingScreen = ({ onDone }) => {
         <div className="loading-logo-wrapper">
           <div className="loading-ring"></div>
           <div className="loading-ring ring-2"></div>
-          <img src="/logo.png" alt="DramaInfo" className="loading-logo" />
+          <img src="/logo.svg" alt="DramaInfo" className="loading-logo" />
         </div>
         <div className="loading-dots">
           <span></span>
