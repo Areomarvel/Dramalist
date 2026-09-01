@@ -3,7 +3,7 @@ const PRIMARY_BASE_URL = import.meta.env.VITE_API_URL || RENDER_BACKEND_URL;
 const FALLBACK_BASE_URL = PRIMARY_BASE_URL === 'http://localhost:2150' ? 'http://127.0.0.1:2150' : RENDER_BACKEND_URL;
 
 export async function apiFetch(endpoint, options = {}) {
-  const token = localStorage.getItem('dramavault_token') || localStorage.getItem('asiandrama_token');
+  const token = localStorage.getItem('dramainfo_token') || localStorage.getItem('dramavault_token') || localStorage.getItem('asiandrama_token');
 
   const headers = {
     'Content-Type': 'application/json',

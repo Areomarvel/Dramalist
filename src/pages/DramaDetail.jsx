@@ -86,7 +86,7 @@ const DramaDetail = () => {
   const director = drama.created_by?.map(p => p.name).join(', ') || 'Various Directors';
   const writers = drama.credits?.crew
     ?.filter(c => c.department === 'Writing' || c.job === 'Writer')
-    .map(w => w.name).slice(0, 3).join(', ') || 'DramaVault Staff';
+    .map(w => w.name).slice(0, 3).join(', ') || 'DramaInfo Staff';
   const networks = drama.networks?.map(n => n.name).join(', ') || 'N/A';
   const countries = drama.origin_country?.join(', ') || 'South Korea';
   const languages = drama.spoken_languages?.map(l => l.english_name).join(', ') || 'Korean';
@@ -129,7 +129,7 @@ const DramaDetail = () => {
             <h1 className="detail-title">{title}</h1>
             <div className="detail-title-actions">
               <WatchlistButton item={watchlistItem} />
-              <ShareButton title={title} text={`Check out ${title} on DramaVault!`} />
+              <ShareButton title={title} text={`Check out ${title} on DramaInfo!`} />
             </div>
           </div>
           {drama.tagline && <p className="detail-tagline">"{drama.tagline}"</p>}
@@ -208,7 +208,7 @@ const DramaDetail = () => {
 
           {/* AsianWiki Staff Plot Synopsis */}
           <div className="asianwiki-synopsis-box">
-            <h3 className="asianwiki-section-title">Plot Synopsis by DramaVault Staff ©</h3>
+            <h3 className="asianwiki-section-title">Plot Synopsis by DramaInfo Staff ©</h3>
             <p className="asianwiki-synopsis-text">
               {drama.overview || 'When they were teenagers, the main characters harbored big dreams of becoming movie directors. As adults, after facing real-life obstacles and career triumphs, they reunite in South Korea to rediscover their true passion and unresolved emotions.'}
             </p>

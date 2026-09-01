@@ -4,10 +4,10 @@ import { authApi, userApi } from '../utils/api';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(() => localStorage.getItem('dramavault_token') || localStorage.getItem('asiandrama_token') || null);
+  const [token, setToken] = useState(() => localStorage.getItem('dramainfo_token') || localStorage.getItem('dramavault_token') || localStorage.getItem('asiandrama_token') || null);
   const [user, setUser] = useState(() => {
     try {
-      const savedUser = localStorage.getItem('dramavault_user');
+      const savedUser = localStorage.getItem('dramainfo_user') || localStorage.getItem('dramavault_user');
       return savedUser ? JSON.parse(savedUser) : null;
     } catch {
       return null;
@@ -28,6 +28,8 @@ export const AuthProvider = ({ children }) => {
   });
 
   const handleLogout = useCallback(() => {
+    localStorage.removeItem('dramainfo_token');
+    localStorage.removeItem('dramainfo_user');
     localStorage.removeItem('dramavault_token');
     localStorage.removeItem('dramavault_user');
     localStorage.removeItem('asiandrama_token');
@@ -38,13 +40,13 @@ export const AuthProvider = ({ children }) => {
   // Verify token on initial load and keep local cached session intact
   useEffect(() => {
     const initAuth = async () => {
-      const storedToken = localStorage.getItem('dramavault_token') || localStorage.getItem('asiandrama_token');
+      const storedToken = localStorage.getItem('dramainfo_token') || localStorage.getItem('dramavault_token') || localStorage.getItem('asiandrama_token');
       if (storedToken) {
         try {
           const res = await authApi.getCurrentUser();
           if (res.user) {
             setUser(res.user);
-            localStorage.setItem('dramavault_user', JSON.stringify(res.user));
+            localStorage.setItem('dramainfo_user', JSON.stringify(res.user));
             if (res.user.watchlist) {
               setWatchlist(res.user.watchlist);
             }
@@ -76,8 +78,8 @@ export const AuthProvider = ({ children }) => {
   const handleLogin = async (email, password) => {
     const res = await authApi.login(email, password);
     if (res.token && res.user) {
-      localStorage.setItem('dramavault_token', res.token);
-      localStorage.setItem('dramavault_user', JSON.stringify(res.user));
+      localStorage.setItem('dramainfo_token', res.token);
+      localStorage.setItem('dramainfo_user', JSON.stringify(res.user));
       setToken(res.token);
       setUser(res.user);
       if (res.user.watchlist) {
@@ -91,8 +93,8 @@ export const AuthProvider = ({ children }) => {
   const handleRegister = async (username, email, password) => {
     const res = await authApi.register(username, email, password);
     if (res.token && res.user) {
-      localStorage.setItem('dramavault_token', res.token);
-      localStorage.setItem('dramavault_user', JSON.stringify(res.user));
+      localStorage.setItem('dramainfo_token', res.token);
+      localStorage.setItem('dramainfo_user', JSON.stringify(res.user));
       setToken(res.token);
       setUser(res.user);
       if (res.user.watchlist) {
@@ -165,7 +167,7 @@ export const AuthProvider = ({ children }) => {
     const res = await userApi.updateProfile(data);
     if (res.user) {
       setUser(res.user);
-      localStorage.setItem('dramavault_user', JSON.stringify(res.user));
+      localStorage.setItem('dramainfo_user', JSON.stringify(res.user));
     }
     return res;
   };

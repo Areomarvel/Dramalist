@@ -6,8 +6,8 @@ const Footer = () => {
       <div className="footer-container">
         <div className="footer-brand-col">
           <Link to="/" className="footer-logo-link">
-            <img src="/logo.png" alt="DramaVault" className="footer-logo" />
-            <span className="footer-site-name">DramaVault</span>
+            <img src="/logo.png" alt="DramaInfo" className="footer-logo" />
+            <span className="footer-site-name">DramaInfo</span>
           </Link>
           <p className="footer-tagline">
             Your ultimate destination for K-Dramas, C-Dramas, J-Dramas, Thai Dramas, Anime &amp; Cartoons. Discover ratings, reviews, full cast filmography, streaming links, and community discussions.
@@ -67,7 +67,7 @@ const Footer = () => {
       </div>
 
       <div className="footer-bottom">
-        <p>© {new Date().getFullYear()} DramaVault. All rights reserved. Data powered by TMDB API.</p>
+        <p>© {new Date().getFullYear()} DramaInfo. All rights reserved. Data powered by TMDB API.</p>
       </div>
     </footer>
   );

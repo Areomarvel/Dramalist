@@ -102,7 +102,7 @@ const PersonDetail = () => {
           <div className="detail-title-row">
             <h1 className="detail-title">{person.name}</h1>
             <div className="detail-title-actions">
-              <ShareButton title={person.name} text={`Check out ${person.name} on DramaVault!`} />
+              <ShareButton title={person.name} text={`Check out ${person.name} on DramaInfo!`} />
             </div>
           </div>
 

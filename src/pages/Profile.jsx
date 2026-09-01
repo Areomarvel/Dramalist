@@ -36,7 +36,7 @@ const Profile = () => {
       <div className="app-container">
         <div className="profile-guest-card">
           <div className="guest-avatar-large">👤</div>
-          <h2>Join DramaVault Community</h2>
+          <h2>Join DramaInfo Community</h2>
           <p>
             Create an account or sign in to sync your drama watchlist across all devices,
             track episode progress, and share ratings with fellow fans.

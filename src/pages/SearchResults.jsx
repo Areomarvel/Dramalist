@@ -84,7 +84,7 @@ const SearchResults = () => {
       <div className="app-container">
         <div className="search-empty-state">
           <div className="search-empty-icon">🔍</div>
-          <h2 className="search-empty-title">Search DramaVault</h2>
+          <h2 className="search-empty-title">Search DramaInfo</h2>
           <p className="search-empty-sub">Find your favourite dramas, movies, and actors</p>
           <form className="search-empty-form" onSubmit={handleLocalSearch}>
             <input

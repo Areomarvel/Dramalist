@@ -52,7 +52,7 @@ const MovieDetail = () => {
 
   const trailer = movie.videos?.results?.find(v => v.type === 'Trailer' && v.site === 'YouTube');
   const director = movie.credits?.crew?.find(c => c.job === 'Director')?.name || 'Various Directors';
-  const writers = movie.credits?.crew?.filter(c => c.department === 'Writing').map(w => w.name).slice(0, 3).join(', ') || 'DramaVault Staff';
+  const writers = movie.credits?.crew?.filter(c => c.department === 'Writing').map(w => w.name).slice(0, 3).join(', ') || 'DramaInfo Staff';
   const languages = movie.spoken_languages?.map(l => l.english_name).join(', ') || 'Korean';
   const countries = movie.production_countries?.map(c => c.name).join(', ') || 'South Korea';
   const posterPath = movie.poster_path ? `${IMAGE_BASE_URL}${movie.poster_path}` : generatedPoster;
@@ -89,7 +89,7 @@ const MovieDetail = () => {
             <h1 className="detail-title">{title}</h1>
             <div className="detail-title-actions">
               <WatchlistButton item={watchlistItem} />
-              <ShareButton title={title} text={`Check out ${title} on DramaVault!`} />
+              <ShareButton title={title} text={`Check out ${title} on DramaInfo!`} />
             </div>
           </div>
           {movie.tagline && <p className="detail-tagline">"{movie.tagline}"</p>}
@@ -166,7 +166,7 @@ const MovieDetail = () => {
 
           {/* AsianWiki Staff Plot Synopsis */}
           <div className="asianwiki-synopsis-box">
-            <h3 className="asianwiki-section-title">Plot Synopsis by DramaVault Staff ©</h3>
+            <h3 className="asianwiki-section-title">Plot Synopsis by DramaInfo Staff ©</h3>
             <p className="asianwiki-synopsis-text">
               {movie.overview || 'An extraordinary cinematic masterpiece telling the riveting tale of ambition, resilience, and personal triumph against overwhelming odds.'}
             </p>
