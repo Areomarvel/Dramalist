@@ -166,8 +166,15 @@ export const AuthProvider = ({ children }) => {
   const updateProfile = async (data) => {
     const res = await userApi.updateProfile(data);
     if (res.user) {
-      setUser(res.user);
-      localStorage.setItem('dramainfo_user', JSON.stringify(res.user));
+      const mergedUser = {
+        ...user,
+        ...res.user,
+        favoriteGenres: res.user.favoriteGenres || user?.favoriteGenres || [],
+        profileCover: res.user.profileCover || user?.profileCover || 'linear-gradient(135deg, #081426 0%, #153e75 42%, #8b5cf6 100%)',
+        coverAccent: res.user.coverAccent || user?.coverAccent || '#5fb6f8'
+      };
+      setUser(mergedUser);
+      localStorage.setItem('dramainfo_user', JSON.stringify(mergedUser));
     }
     return res;
   };
