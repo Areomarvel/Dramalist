@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import CommentSection from '../components/CommentSection';
 import ReactionBox from '../components/ReactionBox';
 import ShareButton from '../components/ShareButton';
 import Breadcrumbs from '../components/Breadcrumbs';
 import { generatePoster } from '../utils/generatePoster';
-import { formatTitle, hasEnglishTitle } from '../utils/translateTitle';
+import { formatTitle } from '../utils/translateTitle';
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
 const BASE_URL = 'https://api.themoviedb.org/3';
@@ -42,8 +42,14 @@ const PersonDetail = () => {
 
   const calculateAge = (dob) => {
     if (!dob) return 'N/A';
-    const diff = Date.now() - new Date(dob).getTime();
-    return Math.abs(new Date(diff).getUTCFullYear() - 1970);
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age;
   };
 
   const instagramUrl = person.external_ids?.instagram_id
@@ -96,7 +102,7 @@ const PersonDetail = () => {
           <div className="detail-title-row">
             <h1 className="detail-title">{person.name}</h1>
             <div className="detail-title-actions">
-              <ShareButton title={person.name} text={`Check out ${person.name} on AsianDramaWiki!`} />
+              <ShareButton title={person.name} text={`Check out ${person.name} on DramaVault!`} />
             </div>
           </div>
 

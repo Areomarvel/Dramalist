@@ -1,5 +1,3 @@
-import React from 'react';
-
 const OSTSection = ({ dramaTitle = '' }) => {
   if (!dramaTitle) return null;
 

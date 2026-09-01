@@ -48,7 +48,7 @@ const KNOWN_TRANSLATIONS = {
 };
 
 // Check if string contains any non-Latin scripts (CJK, Thai, Cyrillic, Arabic, etc.)
-function containsNonLatin(str) {
+export function containsNonLatin(str) {
   if (!str) return false;
   return /[\u0E00-\u0E7F\u4E00-\u9FFF\u3040-\u309F\u30A0-\u30FF\uAC00-\uD7AF\u3400-\u4DBF\u0400-\u04FF\u0600-\u06FF]/.test(str);
 }
@@ -59,10 +59,7 @@ function containsLatin(str) {
   return /[a-zA-Z0-9]/.test(str);
 }
 
-function containsNonLatinScript(str) {
-  if (!str) return false;
-  return /[\u0E00-\u0E7F\u4E00-\u9FFF\u3040-\u309F\u30A0-\u30FF\uAC00-\uD7AF\u3400-\u4DBF\u0400-\u04FF\u0600-\u06FF]/.test(str);
-}
+const containsNonLatinScript = containsNonLatin;
 
 // Clean string by removing non-Latin parentheticals and native script
 function cleanTitle(str) {

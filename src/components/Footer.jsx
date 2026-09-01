@@ -1,4 +1,3 @@
-import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Footer = () => {
@@ -7,8 +6,8 @@ const Footer = () => {
       <div className="footer-container">
         <div className="footer-brand-col">
           <Link to="/" className="footer-logo-link">
-            <img src="/logo.png" alt="AsianDramaWiki" className="footer-logo" />
-            <span className="footer-site-name">AsianDramaWiki</span>
+            <img src="/logo.png" alt="DramaVault" className="footer-logo" />
+            <span className="footer-site-name">DramaVault</span>
           </Link>
           <p className="footer-tagline">
             Your ultimate destination for K-Dramas, C-Dramas, J-Dramas, Thai Dramas, Anime &amp; Cartoons. Discover ratings, reviews, full cast filmography, streaming links, and community discussions.
@@ -68,7 +67,7 @@ const Footer = () => {
       </div>
 
       <div className="footer-bottom">
-        <p>© {new Date().getFullYear()} AsianDramaWiki. All rights reserved. Data powered by TMDB API.</p>
+        <p>© {new Date().getFullYear()} DramaVault. All rights reserved. Data powered by TMDB API.</p>
       </div>
     </footer>
   );

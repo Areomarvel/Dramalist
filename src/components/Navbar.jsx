@@ -216,8 +216,8 @@ const Navbar = () => {
         </button>
 
         {/* CENTER: Brand Logo */}
-        <Link to="/" className="logo-link navbar-logo-center" aria-label="AsianDramaWiki Home">
-          <img src="/logo.png" alt="AsianDramaWiki" className="nav-logo" />
+        <Link to="/" className="logo-link navbar-logo-center" aria-label="DramaVault Home">
+          <img src="/logo.png" alt="DramaVault" className="nav-logo" />
         </Link>
 
         {/* RIGHT: Actions */}
@@ -309,8 +309,8 @@ const Navbar = () => {
       <aside className={`side-drawer ${isDrawerOpen ? 'open' : ''}`} aria-label="Site menu">
         <div className="drawer-header">
           <Link to="/" className="drawer-logo-link" onClick={() => setIsDrawerOpen(false)}>
-            <img src="/logo.png" alt="AsianDramaWiki" className="drawer-logo" />
-            <span className="drawer-site-name">AsianDramaWiki</span>
+            <img src="/logo.png" alt="DramaVault" className="drawer-logo" />
+            <span className="drawer-site-name">DramaVault</span>
           </Link>
           <button
             type="button"
@@ -436,7 +436,7 @@ const Navbar = () => {
               </span>
             </button>
           </div>
-          <p className="drawer-copyright">© {new Date().getFullYear()} AsianDramaWiki</p>
+          <p className="drawer-copyright">© {new Date().getFullYear()} DramaVault</p>
         </div>
       </aside>
     </>

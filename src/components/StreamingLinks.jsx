@@ -1,5 +1,3 @@
-import React from 'react';
-
 const PROVIDERS = [
   { name: 'Netflix', icon: '🎬', color: '#E50914', searchUrl: (t) => `https://www.netflix.com/search?q=${encodeURIComponent(t)}` },
   { name: 'Viki (Rakuten)', icon: '🍿', color: '#00A4E4', searchUrl: (t) => `https://www.viki.com/search?q=${encodeURIComponent(t)}` },

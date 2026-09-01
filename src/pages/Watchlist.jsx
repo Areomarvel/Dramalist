@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { formatTitle } from '../utils/translateTitle';
 import WatchlistButton from '../components/WatchlistButton';

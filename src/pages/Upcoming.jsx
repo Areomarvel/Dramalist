@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import DramaCard from '../components/DramaCard';
 import { hasEnglishTitle } from '../utils/translateTitle';
 
@@ -34,11 +34,7 @@ const Upcoming = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    loadUpcomingByCategory(category);
-  }, [category]);
-
-  const loadUpcomingByCategory = async (cat) => {
+  const loadUpcomingByCategory = useCallback(async (cat) => {
     setLoading(true);
     setError(null);
     try {
@@ -52,7 +48,11 @@ const Upcoming = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    loadUpcomingByCategory(category);
+  }, [category, loadUpcomingByCategory]);
 
   return (
     <div className="app-container">

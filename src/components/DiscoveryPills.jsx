@@ -1,5 +1,3 @@
-import React from 'react';
-
 const DiscoveryPills = ({ items = [], selected = '', onSelect }) => {
   if (!items.length) return null;
 

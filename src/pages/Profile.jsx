@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 
 const Profile = () => {
@@ -36,7 +36,7 @@ const Profile = () => {
       <div className="app-container">
         <div className="profile-guest-card">
           <div className="guest-avatar-large">👤</div>
-          <h2>Join AsianDramaWiki Community</h2>
+          <h2>Join DramaVault Community</h2>
           <p>
             Create an account or sign in to sync your drama watchlist across all devices,
             track episode progress, and share ratings with fellow fans.
@@ -100,7 +100,7 @@ const Profile = () => {
           </div>
           <p className="profile-bio-text">{user.bio || 'Asian drama enthusiast & binge watcher.'}</p>
           <span className="profile-joined">
-            Member since {new Date(user.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            Member since {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Recently'}
           </span>
         </div>
       </div>

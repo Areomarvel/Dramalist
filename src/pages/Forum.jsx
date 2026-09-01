@@ -162,7 +162,7 @@ const Forum = () => {
         <div className="forum-guest-banner">
           <div className="guest-banner-text">
             <span>🔒 <strong>Sign in to participate</strong></span>
-            <p>Join the AsianDramaWiki Community Forum to post reviews, share fan theories, and reply to discussions!</p>
+            <p>Join the DramaVault Community Forum to post reviews, share fan theories, and reply to discussions!</p>
           </div>
           <button
             type="button"

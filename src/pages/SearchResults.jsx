@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import DramaCard from '../components/DramaCard';
 import LoadingScreen from '../components/LoadingScreen';
@@ -19,8 +19,6 @@ const SearchResults = () => {
 
   useEffect(() => {
     if (!query) {
-      setLoading(false);
-      setResults({ dramas: [], people: [] });
       return;
     }
 
@@ -86,7 +84,7 @@ const SearchResults = () => {
       <div className="app-container">
         <div className="search-empty-state">
           <div className="search-empty-icon">🔍</div>
-          <h2 className="search-empty-title">Search AsianDramaWiki</h2>
+          <h2 className="search-empty-title">Search DramaVault</h2>
           <p className="search-empty-sub">Find your favourite dramas, movies, and actors</p>
           <form className="search-empty-form" onSubmit={handleLocalSearch}>
             <input

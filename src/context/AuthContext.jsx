@@ -4,8 +4,15 @@ import { authApi, userApi } from '../utils/api';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(() => localStorage.getItem('asiandrama_token') || null);
+  const [token, setToken] = useState(() => localStorage.getItem('dramavault_token') || localStorage.getItem('asiandrama_token') || null);
+  const [user, setUser] = useState(() => {
+    try {
+      const savedUser = localStorage.getItem('dramavault_user');
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch {
+      return null;
+    }
+  });
   const [loading, setLoading] = useState(true);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalMode, setAuthModalMode] = useState('login'); // 'login' | 'register'
@@ -21,36 +28,43 @@ export const AuthProvider = ({ children }) => {
   });
 
   const handleLogout = useCallback(() => {
+    localStorage.removeItem('dramavault_token');
+    localStorage.removeItem('dramavault_user');
     localStorage.removeItem('asiandrama_token');
     setToken(null);
     setUser(null);
-    // Keep local watchlist for guest browsing
   }, []);
 
-  // Verify token on initial load
+  // Verify token on initial load and keep local cached session intact
   useEffect(() => {
     const initAuth = async () => {
-      if (token) {
+      const storedToken = localStorage.getItem('dramavault_token') || localStorage.getItem('asiandrama_token');
+      if (storedToken) {
         try {
           const res = await authApi.getCurrentUser();
           if (res.user) {
             setUser(res.user);
+            localStorage.setItem('dramavault_user', JSON.stringify(res.user));
             if (res.user.watchlist) {
               setWatchlist(res.user.watchlist);
             }
-          } else {
-            handleLogout();
           }
         } catch (err) {
-          console.warn('Auto login failed or token expired:', err.message);
-          handleLogout();
+          const msg = err.message || '';
+          // Only clear session if token is explicitly invalid/expired (401)
+          if (msg.includes('401') || msg.includes('invalid') || msg.includes('expired') || msg.includes('Unauthorized')) {
+            console.warn('Session expired, logging out:', msg);
+            handleLogout();
+          } else {
+            console.warn('Network / backend offline during session check; preserving active user session:', msg);
+          }
         }
       }
       setLoading(false);
     };
 
     initAuth();
-  }, [token, handleLogout]);
+  }, [handleLogout]);
 
   // Sync guest watchlist to localStorage
   useEffect(() => {
@@ -62,7 +76,8 @@ export const AuthProvider = ({ children }) => {
   const handleLogin = async (email, password) => {
     const res = await authApi.login(email, password);
     if (res.token && res.user) {
-      localStorage.setItem('asiandrama_token', res.token);
+      localStorage.setItem('dramavault_token', res.token);
+      localStorage.setItem('dramavault_user', JSON.stringify(res.user));
       setToken(res.token);
       setUser(res.user);
       if (res.user.watchlist) {
@@ -76,7 +91,8 @@ export const AuthProvider = ({ children }) => {
   const handleRegister = async (username, email, password) => {
     const res = await authApi.register(username, email, password);
     if (res.token && res.user) {
-      localStorage.setItem('asiandrama_token', res.token);
+      localStorage.setItem('dramavault_token', res.token);
+      localStorage.setItem('dramavault_user', JSON.stringify(res.user));
       setToken(res.token);
       setUser(res.user);
       if (res.user.watchlist) {
@@ -149,6 +165,7 @@ export const AuthProvider = ({ children }) => {
     const res = await userApi.updateProfile(data);
     if (res.user) {
       setUser(res.user);
+      localStorage.setItem('dramavault_user', JSON.stringify(res.user));
     }
     return res;
   };
