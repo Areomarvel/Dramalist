@@ -142,11 +142,8 @@ const Profile = () => {
                 </button>
               </div>
             </div>
-            <p className="profile-bio-text">{user.bio || 'Asian drama enthusiast & binge watcher.'}</p>
+            {user.bio && <p className="profile-bio-text">{user.bio}</p>}
             <div className="profile-meta-row">
-              <span className="profile-joined">
-                Member since {user.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Recently'}
-              </span>
               <span className="profile-badge-inline" style={{ borderColor: user.coverAccent || coverAccent }}>
                 {watchlist.length} dramas tracked
               </span>
